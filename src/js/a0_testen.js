@@ -1093,7 +1093,7 @@ function showInstallMicroPythonDialog() {
       <li><b>Hold the BOOT button</b> on the back of the device, then
         briefly tap <b>RES</b> – still holding BOOT. Let go of BOOT
         after a moment.</li>
-      <li>A new disk drive named something like <code>RPI-RP2</code>
+      <li>A new disk drive named <code>RP2350</code>
         appears on the computer.</li>
       <li><b>Drag the <code>micropythonPBCP.uf2</code> file</b> onto that
         drive (or copy it there with your file manager).</li>
@@ -1132,8 +1132,8 @@ function showInstallMicroPythonDialog() {
       <li><b>BOOT-Knopf</b> auf der Rückseite gedrückt halten und
         währenddessen <b>RES</b> einmal kurz drücken. Anschließend BOOT
         loslassen.</li>
-      <li>Auf dem Computer erscheint ein neues Laufwerk mit einem Namen
-        wie <code>RPI-RP2</code>.</li>
+      <li>Auf dem Computer erscheint ein neues Laufwerk mit dem Namen
+        <code>RP2350</code>.</li>
       <li><b>Ziehe die Datei <code>micropythonPBCP.uf2</code></b> auf
         dieses Laufwerk (oder kopiere sie dorthin).</li>
       <li>Das Laufwerk verschwindet, sobald das Kopieren abgeschlossen

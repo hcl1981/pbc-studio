@@ -167,14 +167,18 @@ function ausgabeSenden() {
 // matches the PicoBoy's, so MemoryError comes where it would on the device.
 async function ladeMicroPython(mjsUrl, wasmUrl, heapsize) {
   const mod = await import(mjsUrl);
+  // Output arrives byte by byte (linebuffer off), so a character like ü
+  // spans two calls; the stream decoder keeps the first byte until then.
+  const utf8Out = new TextDecoder(), utf8Err = new TextDecoder();
+  const text = (dec, t) => (typeof t === 'string' ? t : dec.decode(t, { stream: true }));
   mp = await mod.loadMicroPython({
     url: wasmUrl,
     heapsize,
     pystack: 8 * 1024,
     // linebuffer off: print(..., end="") appears at once
     linebuffer: false,
-    stdout: (t) => ausgabe(typeof t === 'string' ? t : new TextDecoder().decode(t)),
-    stderr: (t) => ausgabe(typeof t === 'string' ? t : new TextDecoder().decode(t)),
+    stdout: (t) => ausgabe(text(utf8Out, t)),
+    stderr: (t) => ausgabe(text(utf8Err, t)),
   });
   try { mp.FS.mkdir('/lib'); } catch (_) {}
   mp.FS.writeFile('/lib/pbc.py', PBC_PY);
