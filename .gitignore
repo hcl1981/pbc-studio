@@ -1,0 +1,6 @@
+__pycache__/
+node_modules/
+tests/ergebnisse/
+tests/tmp/
+original.html
+tests/node_modules

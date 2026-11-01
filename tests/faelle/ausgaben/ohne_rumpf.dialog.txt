@@ -1,0 +1,1 @@
+Schreibfehler im Code Python kann eine Zeile nicht verstehen. Häufige Ursachen: ein fehlender Doppelpunkt ":" am Ende von "if"/Schleife, eine nicht geschlossene Klammer oder ein fehlendes Anführungszeichen bei einem Text. OK

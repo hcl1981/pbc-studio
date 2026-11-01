@@ -1,0 +1,925 @@
+</head>
+<body>
+
+<div class="app">
+
+  <header class="titlebar">
+    <!-- Left zone: lines up width-wise with the sidebar below. -->
+    <div class="titlebar-left">
+      <div class="logo-text">PBC+ Studio</div>
+    </div>
+
+    <!-- Right zone: starts at the sidebar's right edge. The first
+         action is "Dateien" (sits flush against the divider) and
+         "Zu Text wechseln" is now next to it, since they're both
+         file/mode-level actions and naturally belong together.
+         Run-flow buttons (Testen / Stop) come after, then the
+         connection toggle pushed to the far right. -->
+    <div class="titlebar-right">
+      <!-- Dateien dropdown: all file-related actions live here.
+           Hochladen aufs Gerät ist Teil von "Speichern", weil das aus
+           Schülersicht das Gleiche ist: "schreibe das Programm
+           irgendwohin". -->
+      <div class="dropdown" id="dd-files">
+        <button class="tb-btn dropdown-toggle" id="dd-files-btn">
+          Dateien ▾
+        </button>
+        <div class="dropdown-menu" id="dd-files-menu">
+          <button data-action="new">Neu</button>
+          <hr>
+          <div class="dropdown-section">Öffnen</div>
+          <button data-action="open-local">Vom Computer…</button>
+          <button data-action="open-device">Vom PBC+…</button>
+          <hr>
+          <div class="dropdown-section">Speichern</div>
+          <button data-action="save-local">Auf den Computer…</button>
+          <button data-action="save-device">Auf den PBC+…</button>
+          <hr>
+          <div class="dropdown-section" id="dd-data-section">Daten auf dem PBC+</div>
+          <button data-action="paint-new">Bild zeichnen…</button>
+          <button data-action="images">Bilder verwalten…</button>
+          <button data-action="manage-files">Dateien verwalten…</button>
+          <hr>
+          <div class="dropdown-section">Übertragen</div>
+          <button data-action="transfer-to-emu">PBC+ → Emulator…</button>
+          <button data-action="transfer-to-dev">Emulator → PBC+…</button>
+          <hr>
+          <button data-action="backup-flash">Flash-Backup erstellen (.uf2)…</button>
+          <button data-action="install-micropython">MicroPython installieren…</button>
+          <button data-action="install-launcher">Startmenü installieren…</button>
+        </div>
+      </div>
+
+      <button class="tb-btn" id="btn-settings"
+              title="Einstellungen">
+        Einstellungen
+      </button>
+      <button class="tb-btn" id="btn-mode">Zu Text wechseln</button>
+
+      <div class="titlebar-spacer"></div>
+
+      <button class="tb-btn conn-btn" id="btn-connect">Verbinden</button>
+
+      <button class="tb-btn primary" id="btn-test">▶ Testen</button>
+      <button class="tb-btn danger"  id="btn-stop">■ Stop</button>
+
+      <button class="tb-btn" id="btn-reconnect"
+              title="Neu verbinden (nach Reset am Gerät)"
+              style="padding:6px 9px;">↻</button>
+
+      <!-- Target switch: choose whether Testen / Stop / Verbinden act
+           on the real PBC+ (USB) or the in-browser Emulator. Sits at
+           the far right and stays visible in both modes. The emulator
+           panel shows when its target is connected and hides on
+           disconnect. -->
+      <div class="target-switch" id="target-switch" role="group"
+           title="Ziel wählen: echtes Gerät oder Emulator">
+        <button class="target-opt active" id="target-device"
+                data-target="device" data-label="PBC+">PBC+</button>
+        <button class="target-opt" id="target-emulator"
+                data-target="emulator" data-label="Emulator">Emulator</button>
+      </div>
+    </div>
+  </header>
+  <!-- legacy emulator button kept hidden; some code clicks/styles it -->
+  <button id="btn-emulator" style="display:none;"></button>
+
+  <!-- Hidden buttons kept for backwards compatibility: their event
+       handlers further down in the script still wire to these IDs.
+       The dropdown above just clicks them programmatically. -->
+  <div style="display:none;">
+    <button id="btn-new"></button>
+    <button id="btn-open"></button>
+    <button id="btn-save"></button>
+    <button id="btn-images"></button>
+    <button id="btn-upload"></button>
+  </div>
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <section class="main">
+    <div class="workspace">
+      <div id="blockly"></div>
+      <div class="text-wrap" id="text-wrap" hidden>
+        <!-- Banner is now hidden by default: in the new flow the
+             editor is always directly editable when in text mode.
+             Kept around so legacy code paths that reference these
+             elements don't blow up. -->
+        <div class="text-banner" id="text-banner" style="display:none;">
+          <span id="text-banner-msg"></span>
+          <button class="tb-btn primary" id="btn-edit-on" hidden>
+            Bearbeitung aktivieren
+          </button>
+        </div>
+        <textarea class="text-editor" id="texteditor"
+                  spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <aside class="codepane" id="codepane">
+      <div class="codepane-tab" id="codetab" title="Codeansicht ein-/ausblenden">
+        <span>Code</span>
+      </div>
+      <div class="codepane-body">
+        <div class="codepane-header">Generiertes Python</div>
+        <pre class="codepane-content" id="codeview"></pre>
+      </div>
+    </aside>
+
+    <!-- Help panel: only shown in text mode. The user clicks an
+         entry in the (text-mode) sidebar, the content renders here.
+         "Einfügen" puts a snippet at the editor cursor. -->
+    <aside class="helppane" id="helppane" hidden>
+      <div class="helppane-header">
+        <span id="helppane-title">Hilfe</span>
+        <button class="close" id="helppane-close" title="Schließen">×</button>
+      </div>
+      <div class="helppane-body" id="helppane-body">
+        <p style="color:var(--fg-2);">Klicke links auf einen Eintrag, um Hilfe und Beispiele zu sehen.</p>
+      </div>
+    </aside>
+  </section>
+
+  <footer class="terminal-area">
+    <div class="terminal-trenner" id="terminal-trenner"
+         title="Ziehen, um das Terminal größer oder kleiner zu machen"></div>
+    <div class="terminal-header">
+      <span>Seriell / REPL</span>
+      <button id="btn-term-clear">Konsole leeren</button>
+      <button id="btn-term-reset">Soft-Reset</button>
+      <span style="margin-left:auto;color:var(--fg-2);" id="conn-info">nicht verbunden</span>
+    </div>
+    <div id="terminal"></div>
+  </footer>
+
+</div>
+
+<footer class="page-footer">
+  <a data-action="contact" id="footer-contact">Kontakt</a>
+  <a data-action="impressum" id="footer-impressum">Impressum</a>
+</footer>
+
+<input type="file" class="hidden" id="file-open" accept=".pbcp,.xml,.py,.json">
+<input type="file" class="hidden" id="file-image" accept="image/png" multiple>
+<input type="file" class="hidden" id="file-zip" accept=".zip,application/zip">
+
+<!-- ============================================================ -->
+<!-- Open-source picker: local file vs. file from connected PBC+  -->
+<!-- ============================================================ -->
+<!-- ============================================================ -->
+<!-- Settings (Einstellungen): currently a list of external       -->
+<!-- sensor modules with checkboxes + pin config fields.          -->
+<!-- ============================================================ -->
+<div class="modal-bg" id="settings-modal">
+  <div class="modal" style="min-width:520px;max-width:720px;">
+    <h2 style="margin-top:0;">Einstellungen</h2>
+
+    <!-- Language. Stored in localStorage; changing it triggers a
+         reload so all the static block definitions can rebuild. -->
+    <div style="border:1px solid var(--border);border-radius:6px;
+                padding:10px 12px;margin-bottom:14px;
+                background:var(--bg-1);
+                display:flex;align-items:center;gap:14px;">
+      <div style="flex:1;">
+        <div style="font-weight:600;">Sprache</div>
+        <div style="font-size:12px;color:var(--fg-2);">
+          Bei Wechsel wird die Seite neu geladen.
+        </div>
+      </div>
+      <select id="settings-lang"
+              style="background:var(--bg-2);color:var(--fg-0);
+                     border:1px solid var(--border);border-radius:4px;
+                     padding:4px 8px;font-size:13px;">
+        <option value="de">Deutsch</option>
+        <option value="en">Englisch</option>
+      </select>
+    </div>
+
+    <!-- Emulator: which one runs, and a switch back to the old one. -->
+    <div style="border:1px solid var(--border);border-radius:6px;
+                padding:10px 12px;margin-bottom:14px;
+                background:var(--bg-1);
+                display:flex;align-items:center;gap:14px;">
+      <div style="flex:1;">
+        <div style="font-weight:600;">Emulator</div>
+        <div style="font-size:12px;color:var(--fg-2);" id="settings-emu-info">
+        </div>
+      </div>
+    </div>
+
+    <!-- Font size of the Python editor in text mode. Stored in
+         localStorage (EDITOR_FONT_KEY) and applied live on save. -->
+    <div style="border:1px solid var(--border);border-radius:6px;
+                padding:10px 12px;margin-bottom:14px;
+                background:var(--bg-1);
+                display:flex;align-items:center;gap:14px;">
+      <div style="flex:1;">
+        <div style="font-weight:600;">Schriftgröße im Texteditor</div>
+        <div style="font-size:12px;color:var(--fg-2);">
+          Gilt für den Python-Editor im Text-Modus.
+        </div>
+      </div>
+      <select id="settings-editor-font"
+              style="background:var(--bg-2);color:var(--fg-0);
+                     border:1px solid var(--border);border-radius:4px;
+                     padding:4px 8px;font-size:13px;">
+        <option value="12">12 px</option>
+        <option value="14">14 px</option>
+        <option value="16">16 px</option>
+        <option value="18">18 px</option>
+        <option value="20">20 px</option>
+        <option value="24">24 px</option>
+        <option value="28">28 px</option>
+      </select>
+    </div>
+
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:14px;">
+      Aktivierte Sensoren erscheinen als Block-Kategorie
+      „Externe Sensoren“. Der Treiber-Code wird automatisch in dein
+      Programm eingebaut – du musst keine Bibliotheken hochladen.
+    </div>
+    <div id="settings-sensors"></div>
+    <div style="margin-top:10px;padding-top:12px;
+                border-top:1px solid var(--border);
+                font-size:12.5px;color:var(--fg-1);">
+      Dein Modul fehlt?
+      <a id="settings-hw-wish"
+         style="color:var(--accent);cursor:pointer;text-decoration:underline;">
+         Hier klicken und Hardware wünschen.</a>
+    </div>
+    <div class="modal-foot" style="margin-top:18px;">
+      <button class="tb-btn" id="settings-cancel"
+              style="margin-right:auto;">Abbrechen</button>
+      <button class="tb-btn primary" id="settings-save">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="open-modal">
+  <div class="modal" style="min-width:480px;max-width:640px;">
+    <h2 style="margin-top:0;">Programm öffnen</h2>
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:14px;">
+      Lade ein gespeichertes Block- oder Python-Programm.
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <button class="tb-btn primary" id="open-local-btn">
+        Vom Computer…
+      </button>
+      <button class="tb-btn" id="open-device-btn">
+        Vom PBC+…
+      </button>
+      <button class="tb-btn" id="open-cancel"
+              style="margin-left:auto;">Abbrechen</button>
+    </div>
+    <!-- Device file listing appears here once the user clicks
+         "Vom PBC+…". Hidden by default since the local-file
+         path is the more common one. -->
+    <div id="open-device-pane" style="display:none;">
+      <div style="font-size:12px;color:var(--fg-2);margin-bottom:6px;">
+        Dateien auf dem Gerät (nur <code>.py</code>):
+      </div>
+      <div class="modal-body" id="open-device-list"
+           style="max-height:320px;overflow:auto;
+                  border:1px solid var(--border);border-radius:6px;
+                  padding:6px;">
+        <div style="color:var(--fg-2);text-align:center;padding:24px;">
+          Lade…
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--fg-2);margin-top:8px;">
+        Hinweis: Vom PBC+ geladene Dateien landen im Text-Modus.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Save-to-device: filename input with a list of existing files -->
+<!-- ============================================================ -->
+<!-- ============================================================ -->
+<!-- New sprite dialog: name + image picker                       -->
+<!-- ============================================================ -->
+<div class="modal-bg" id="new-sprite-modal">
+  <div class="modal" style="min-width:380px;max-width:480px;">
+    <h2 style="margin-top:0;">Neues Sprite</h2>
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:14px;">
+      Wähle einen Namen und ein Bild. Das Bild muss schon auf den
+      PBC+ hochgeladen sein (oder per „Bilder verwalten…").
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;
+                align-items:center;">
+      <label style="font-size:12px;color:var(--fg-2);width:60px;">Name:</label>
+      <input type="text" id="new-sprite-name" value="spieler"
+             style="flex:1;background:var(--bg-2);color:var(--fg-0);
+                    border:1px solid var(--border);border-radius:4px;
+                    padding:6px 8px;font-family:ui-monospace,monospace;
+                    font-size:13px;">
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;
+                align-items:center;">
+      <label style="font-size:12px;color:var(--fg-2);width:60px;">Bild:</label>
+      <select id="new-sprite-image"
+              style="flex:1;background:var(--bg-2);color:var(--fg-0);
+                     border:1px solid var(--border);border-radius:4px;
+                     padding:6px 8px;font-family:ui-monospace,monospace;
+                     font-size:13px;">
+      </select>
+    </div>
+    <div id="new-sprite-hint"
+         style="font-size:11px;color:var(--fg-2);margin-bottom:14px;">
+    </div>
+    <div class="modal-foot">
+      <button class="tb-btn" id="new-sprite-cancel"
+              style="margin-right:auto;">Abbrechen</button>
+      <button class="tb-btn primary" id="new-sprite-ok">Anlegen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="save-modal">
+  <div class="modal" style="min-width:480px;max-width:640px;">
+    <h2 style="margin-top:0;">Auf den PBC+ speichern</h2>
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:14px;"
+         id="save-modal-hint">
+      Wähle einen Dateinamen. Oder klicke auf eine vorhandene Datei,
+      um sie zu überschreiben.
+    </div>
+    <!-- Block mode only: the device can hold the program in two forms.
+         Python runs there but can't become blocks again; a block
+         project is only carried along and opened in the Studio. -->
+    <div id="save-block-wahl" style="display:none;margin-bottom:14px;
+         font-size:12.5px;line-height:1.45;color:var(--fg-0);">
+      <label style="display:flex;gap:8px;padding:6px 0;cursor:pointer;">
+        <input type="radio" name="save-art" value=".py" checked>
+        <span><strong>Python-Programm (.py)</strong>: startet auf dem
+        PicoBoy, lässt sich aber nicht wieder als Blöcke öffnen.</span>
+      </label>
+      <label style="display:flex;gap:8px;padding:6px 0;cursor:pointer;">
+        <input type="radio" name="save-art" value=".pbcp">
+        <span><strong>Block-Projekt (.pbcp)</strong>: zum Mitnehmen und
+        Weiterbauen in PBC+ Studio. Auf dem PicoBoy starten lässt es
+        sich nicht.</span>
+      </label>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;
+                align-items:center;">
+      <label style="font-size:12px;color:var(--fg-2);">Dateiname:</label>
+      <input type="text" id="save-name" value="programm.py"
+             style="flex:1;background:var(--bg-2);color:var(--fg-0);
+                    border:1px solid var(--border);border-radius:4px;
+                    padding:6px 8px;font-family:ui-monospace,monospace;
+                    font-size:13px;">
+    </div>
+    <div style="font-size:12px;color:var(--fg-2);margin:14px 0 6px;">
+      Vorhandene Dateien (Klick = übernehmen + überschreiben):
+    </div>
+    <div class="modal-body" id="save-device-list"
+         style="max-height:260px;overflow:auto;
+                border:1px solid var(--border);border-radius:6px;
+                padding:6px;">
+      <div style="color:var(--fg-2);text-align:center;padding:24px;">
+        Lade…
+      </div>
+    </div>
+    <div class="modal-foot" style="margin-top:14px;">
+      <button class="tb-btn" id="save-cancel"
+              style="margin-right:auto;">Abbrechen</button>
+      <button class="tb-btn primary" id="save-confirm">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="img-modal">
+  <div class="modal">
+    <h2>Bilder auf dem PBC+</h2>
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:12px;">
+      Hochgeladene PNG-Dateien kannst du direkt auf dem Display
+      anzeigen lassen (Block <em>Bild anzeigen</em> unter „Display")
+      oder als Sprite verwenden (Blöcke unter „Sprites").
+      Zum Hoch- oder Anzeigen muss das Gerät verbunden sein.
+    </div>
+    <div class="modal-body" id="img-list">
+      <div style="color:var(--fg-2);text-align:center;padding:24px;">
+        Zuerst mit dem Gerät verbinden.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="tb-btn" id="img-refresh">Aktualisieren</button>
+      <button class="tb-btn primary" id="img-upload-btn">PNG hochladen…</button>
+      <button class="tb-btn" id="img-zip-btn" title="Mehrere PNG-Bilder auf einmal, ohne Bildeditor">ZIP hochladen…</button>
+      <button class="tb-btn" id="img-close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================ -->
+<!-- Color picker modal                                           -->
+<!-- ============================================================ -->
+<div class="modal-bg" id="color-modal">
+  <div class="modal" style="min-width:340px;max-width:380px;">
+    <h2 style="text-align:center;" id="color-modal-title">Farbe wählen</h2>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px;margin:8px 0 20px 0;">
+      <input type="color" id="color-modal-picker"
+             style="width:200px;height:80px;border:1px solid var(--border);
+                    border-radius:8px;background:transparent;cursor:pointer;">
+      <div style="font-family:ui-monospace,monospace;color:var(--fg-1);
+                  font-size:13px;" id="color-modal-hex">#ff8040</div>
+    </div>
+    <div class="modal-foot" style="justify-content:center;">
+      <button class="tb-btn"        id="color-modal-cancel">Abbrechen</button>
+      <button class="tb-btn primary" id="color-modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Image editor modal: crop + scale before upload               -->
+<!-- ============================================================ -->
+<div class="modal-bg" id="ie-modal">
+  <div class="modal" style="min-width:760px;max-width:95vw;">
+    <h2 style="margin-top:0;">Bild bearbeiten und hochladen</h2>
+    <div id="ie-empty"
+         style="padding:60px 20px;text-align:center;color:var(--fg-2);
+                border:1px dashed var(--border);border-radius:8px;
+                margin-bottom:14px;">
+      Noch kein Bild geladen.<br>
+      <button class="tb-btn primary" id="ie-pick-btn"
+              style="margin-top:14px;">Bild von der Festplatte wählen…</button>
+    </div>
+    <div id="ie-edit" style="display:none;">
+      <div style="display:flex;gap:16px;margin-bottom:14px;">
+        <div style="position:relative;flex:1;min-width:0;">
+          <canvas id="ie-canvas"
+                  style="display:block;background:#000;border:1px solid var(--border);
+                         border-radius:6px;cursor:crosshair;max-width:100%;"></canvas>
+        </div>
+        <div style="width:230px;flex-shrink:0;
+                    display:flex;flex-direction:column;gap:12px;
+                    font-size:13px;color:var(--fg-1);">
+          <div>
+            <div style="text-transform:uppercase;letter-spacing:1px;font-size:11px;
+                        color:var(--fg-2);margin-bottom:4px;">Ausschnitt (Original)</div>
+            <div id="ie-crop-info" style="font-family:ui-monospace,monospace;">—</div>
+          </div>
+          <div>
+            <div style="text-transform:uppercase;letter-spacing:1px;font-size:11px;
+                        color:var(--fg-2);margin-bottom:4px;">Ausgabegröße</div>
+            <div style="display:flex;align-items:center;gap:6px;
+                        font-family:ui-monospace,monospace;">
+              <input type="number" id="ie-out-w" min="1" max="240"
+                     style="width:60px;background:var(--bg-2);color:var(--fg-0);
+                            border:1px solid var(--border);border-radius:4px;
+                            padding:4px 6px;font-family:inherit;">
+              ×
+              <input type="number" id="ie-out-h" min="1" max="280"
+                     style="width:60px;background:var(--bg-2);color:var(--fg-0);
+                            border:1px solid var(--border);border-radius:4px;
+                            padding:4px 6px;font-family:inherit;">
+              px
+            </div>
+            <div style="color:var(--fg-2);font-size:11px;margin-top:4px;">
+              Maximal 240 × 280 (Display-Größe)
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;
+                          margin-top:8px;font-size:12px;color:var(--fg-1);
+                          cursor:pointer;">
+              <input type="checkbox" id="ie-lock-ratio" checked>
+              Seitenverhältnis beibehalten
+            </label>
+            <!-- Scale slider: lets the user shrink the output below
+                 the crop size without typing numbers. 1..100 % of
+                 the largest dimension the crop fits into (= 240 or
+                 280 depending on orientation). Lets you go down to
+                 ~1px so a "make this 10×10 sprite" workflow is
+                 just three drags away. -->
+            <div style="margin-top:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;
+                          font-size:11px;color:var(--fg-2);">
+                <span>Skalierung</span>
+                <span id="ie-scale-val"
+                      style="font-family:ui-monospace,monospace;color:var(--fg-1);">100 %</span>
+              </div>
+              <input type="range" id="ie-scale" min="1" max="100" value="100"
+                     style="width:100%;margin-top:4px;accent-color:var(--accent);">
+            </div>
+          </div>
+          <div>
+            <div style="text-transform:uppercase;letter-spacing:1px;font-size:11px;
+                        color:var(--fg-2);margin-bottom:4px;">Dateiname</div>
+            <input type="text" id="ie-name" value="bild.png"
+                   style="width:100%;background:var(--bg-2);color:var(--fg-0);
+                          border:1px solid var(--border);border-radius:4px;
+                          padding:6px 8px;font-family:ui-monospace,monospace;
+                          font-size:12.5px;">
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:12px;">
+            <div style="text-transform:uppercase;letter-spacing:1px;font-size:11px;
+                        color:var(--fg-2);margin-bottom:6px;">
+              Vorschau auf dem Display
+            </div>
+            <!-- A 240x280 stand-in for the PicoBoy screen. The output
+                 image is drawn inside it at actual pixel size, so the
+                 user can see at a glance how much of the screen their
+                 sprite takes up. -->
+            <div id="ie-display-frame"
+                 style="position:relative;width:120px;height:140px;
+                        background:#000;border:2px solid #444;
+                        border-radius:10px;margin:0 auto;
+                        box-shadow:inset 0 0 0 1px #222;">
+              <canvas id="ie-preview"
+                      style="position:absolute;image-rendering:pixelated;"></canvas>
+            </div>
+            <div id="ie-preview-info"
+                 style="text-align:center;color:var(--fg-2);font-size:11px;
+                        margin-top:6px;font-family:ui-monospace,monospace;">
+              —
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="color:var(--fg-2);font-size:12px;margin-bottom:10px;">
+        Tipp: Ziehe das blaue Rechteck zum Verschieben, die Ecken zum
+        Verändern der Größe. Das Bild wird beim Hochladen auf die
+        Ausgabegröße skaliert.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="tb-btn" id="ie-pick-btn-alt"
+              style="margin-right:auto;">Anderes Bild…</button>
+      <button class="tb-btn" id="ie-cancel">Abbrechen</button>
+      <button class="tb-btn primary" id="ie-save">Hochladen</button>
+    </div>
+  </div>
+</div>
+<input type="file" class="hidden" id="ie-file" accept="image/*">
+
+<!-- ============================================================ -->
+<!-- Paint editor: create a PNG from scratch with drawing tools.   -->
+<!-- Two stages: first the size picker, then the canvas + tools.   -->
+<!-- ============================================================ -->
+
+<div class="modal-bg" id="paint-size-modal">
+  <div class="modal" style="min-width:420px;max-width:520px;">
+    <h2 style="margin-top:0;">Neues Bild zeichnen</h2>
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:14px;">
+      Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel
+      gross; ein ganzes Display ist 240×280.
+    </div>
+    <!-- Preset size grid. Click selects + closes. The +Custom row
+         lets the user enter arbitrary dimensions. -->
+    <div id="paint-size-grid"
+         style="display:grid;grid-template-columns:1fr 1fr;
+                gap:8px;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;align-items:center;
+                margin-bottom:6px;">
+      <label style="font-size:12px;color:var(--fg-2);width:60px;">
+        Breite:</label>
+      <input type="number" id="paint-size-w" min="1" max="320" value="32"
+             style="flex:1;background:var(--bg-2);color:var(--fg-0);
+                    border:1px solid var(--border);border-radius:4px;
+                    padding:6px 8px;font-family:ui-monospace,monospace;">
+      <label style="font-size:12px;color:var(--fg-2);width:50px;">
+        Höhe:</label>
+      <input type="number" id="paint-size-h" min="1" max="320" value="32"
+             style="flex:1;background:var(--bg-2);color:var(--fg-0);
+                    border:1px solid var(--border);border-radius:4px;
+                    padding:6px 8px;font-family:ui-monospace,monospace;">
+    </div>
+    <div class="modal-foot">
+      <button class="tb-btn" id="paint-size-cancel"
+              style="margin-right:auto;">Abbrechen</button>
+      <button class="tb-btn primary" id="paint-size-ok">Anlegen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="paint-modal">
+  <div class="modal" style="min-width:780px;max-width:95vw;">
+    <h2 style="margin-top:0;display:flex;align-items:center;gap:12px;">
+      <span>Bild zeichnen</span>
+      <span id="paint-title-size"
+            style="font-size:12px;color:var(--fg-2);font-weight:400;
+                   font-family:ui-monospace,monospace;"></span>
+      <!-- Action buttons live in the title row so the editor stays
+           visually tight: the user always sees Neu / Rückgängig /
+           Speichern / Abbrechen in the same place, regardless of how
+           full the canvas is. The flex spacer pushes them to the
+           right edge. -->
+      <span style="flex:1;"></span>
+      <button class="tb-btn" id="paint-clear"
+              style="font-size:12.5px;">Neu</button>
+      <button class="tb-btn" id="paint-undo"
+              style="font-size:12.5px;">Rückgängig</button>
+      <button class="tb-btn primary" id="paint-save"
+              style="font-size:12.5px;">Speichern</button>
+      <button class="tb-btn" id="paint-cancel"
+              style="font-size:12.5px;">Schließen</button>
+    </h2>
+    <div style="display:flex;gap:18px;align-items:flex-start;
+                margin-bottom:14px;">
+      <!-- Tools column on the left -->
+      <div style="display:flex;flex-direction:column;gap:6px;width:170px;
+                  flex-shrink:0;">
+        <div style="font-size:11px;color:var(--fg-2);text-transform:uppercase;
+                    letter-spacing:0.5px;margin-bottom:2px;">Werkzeug</div>
+        <!-- Two-column grid so paired tools (filled vs. outlined)
+             sit side by side and the palette stays compact. -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <button class="paint-tool" data-tool="pen">
+            <span class="icon">✎</span><span>Stift</span>
+          </button>
+          <button class="paint-tool" data-tool="line">
+            <span class="icon">／</span><span>Linie</span>
+          </button>
+          <button class="paint-tool" data-tool="rect">
+            <span class="icon">▭</span><span>Rechteck</span>
+          </button>
+          <button class="paint-tool" data-tool="rect_fill">
+            <span class="icon">▬</span><span>gefüllt</span>
+          </button>
+          <button class="paint-tool" data-tool="ellipse">
+            <span class="icon">◯</span><span>Ellipse</span>
+          </button>
+          <button class="paint-tool" data-tool="ellipse_fill">
+            <span class="icon">●</span><span>gefüllt</span>
+          </button>
+        </div>
+        <div style="font-size:11px;color:var(--fg-2);text-transform:uppercase;
+                    letter-spacing:0.5px;margin:8px 0 2px 0;">Stärke</div>
+        <input type="range" id="paint-size" min="1" max="20" value="2"
+               style="width:100%;">
+        <div id="paint-size-label"
+             style="font-size:12px;color:var(--fg-1);text-align:center;
+                    font-family:ui-monospace,monospace;">2 px</div>
+        <div style="font-size:11px;color:var(--fg-2);text-transform:uppercase;
+                    letter-spacing:0.5px;margin:8px 0 2px 0;">Farbe</div>
+        <!-- Native colour picker + a "Radieren" toggle. When the
+             toggle is on, the current tool paints fully-transparent
+             pixels (alpha 0), which is exactly what an eraser does
+             -- so no separate eraser tool is needed. -->
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="color" id="paint-color" value="#000000"
+                 style="width:44px;height:32px;border:1px solid var(--border);
+                        border-radius:4px;background:transparent;cursor:pointer;
+                        padding:0;flex-shrink:0;">
+          <button class="paint-tool row" id="paint-color-transparent"
+                  style="flex:1;">⌫ Radieren</button>
+        </div>
+      </div>
+      <!-- Canvas area. Two stacked canvases: the "permanent" image
+           and a "preview" overlay for the live tool feedback (line /
+           rect / ellipse drag) before commit. The checkerboard
+           transparency indicator is a CSS background on the wrapper
+           with a FIXED display-pixel size so it stays clearly visible
+           regardless of the image's pixel dimensions. -->
+      <div style="flex:1;display:flex;justify-content:center;
+                  align-items:flex-start;">
+        <div id="paint-canvas-wrap"
+             style="position:relative;border:1px solid var(--border);
+                    background-color:#555;
+                    background-image:
+                      linear-gradient(45deg, #3a3a3a 25%, transparent 25%),
+                      linear-gradient(-45deg, #3a3a3a 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #3a3a3a 75%),
+                      linear-gradient(-45deg, transparent 75%, #3a3a3a 75%);
+                    background-size: 16px 16px;
+                    background-position: 0 0, 0 8px, 8px -8px, -8px 0;">
+          <canvas id="paint-canvas"
+                  style="display:block;image-rendering:pixelated;
+                         position:absolute;top:0;left:0;"></canvas>
+          <canvas id="paint-canvas-preview"
+                  style="display:block;image-rendering:pixelated;
+                         position:absolute;top:0;left:0;
+                         touch-action:none;cursor:crosshair;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Connect chooser: pick between real USB device and emulator   -->
+<!-- ============================================================ -->
+<div class="modal-bg" id="connect-chooser-modal">
+  <div class="modal" style="min-width:420px;max-width:500px;">
+    <h2 style="margin-top:0;">Verbinden</h2>
+    <div style="color:var(--fg-1);font-size:13px;margin-bottom:16px;">
+      Wie möchtest du dein Programm ausführen?
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button id="connect-real" class="tb-btn"
+              style="text-align:left;padding:14px;font-size:14px;
+                     display:flex;flex-direction:column;align-items:flex-start;
+                     gap:4px;">
+        <span style="font-weight:600;">PBC+ über USB</span>
+        <span style="font-size:12px;color:var(--fg-2);font-weight:400;">
+          Echtes Gerät, am Computer angeschlossen
+        </span>
+      </button>
+      <button id="connect-emulator" class="tb-btn primary"
+              style="text-align:left;padding:14px;font-size:14px;
+                     display:flex;flex-direction:column;align-items:flex-start;
+                     gap:4px;">
+        <span style="font-weight:600;">Emulator</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.85);font-weight:400;">
+          Virtueller PBC+ im Browser, kein Gerät nötig
+        </span>
+      </button>
+    </div>
+    <div class="modal-foot">
+      <button class="tb-btn" id="connect-chooser-cancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Emulator panel: virtual PBC+, anchored to top-right corner.   -->
+<!-- Unlike modals, it does NOT cover the rest of the IDE -- the    -->
+<!-- student needs to click Testen / Stop / build blocks while the  -->
+<!-- emulator is open.                                              -->
+<!-- ============================================================ -->
+<!-- ============================================================ -->
+<!-- Emulator panel: virtual PBC+, draggable floating panel.       -->
+<!-- Uses the actual product rendering (pbcp.png) as background so  -->
+<!-- it looks pixel-identical to the hardware.                      -->
+<!--                                                                -->
+<!-- Layout: a header strip (drag handle + status + close), then a  -->
+<!-- container whose width controls the overall scale. Inside the   -->
+<!-- container, the rendering is absolutely positioned and the      -->
+<!-- display canvas plus click targets sit over it in percent-based -->
+<!-- positions that match the rendering's coordinates. The PCB AR   -->
+<!-- is 609:1035 (1.700) so the container height is set via         -->
+<!-- aspect-ratio for crisp scaling at any window size.             -->
+<!-- ============================================================ -->
+<div id="emulator-panel"
+     style="display:none;position:fixed;top:60px;right:16px;
+            width:360px;background:var(--bg-1);border:1px solid var(--border);
+            border-radius:10px;
+            box-shadow:0 8px 28px rgba(0,0,0,0.5);
+            z-index:9000;user-select:none;">
+  <!-- Drag handle: header strip. cursor:move makes it discoverable. -->
+  <div id="emu-drag-handle"
+       style="display:flex;align-items:center;gap:8px;
+              padding:8px 10px;cursor:move;
+              border-bottom:1px solid var(--border);
+              background:var(--bg-2);border-radius:9px 9px 0 0;">
+    <strong style="flex:1;font-size:13px;">PBC+ Emulator</strong>
+    <span id="emu-status"
+          style="font-size:11px;color:var(--fg-2);
+                 font-family:ui-monospace,monospace;"></span>
+    <button class="tb-btn" id="emu-close-btn"
+            style="font-size:14px;padding:2px 8px;line-height:1;">×</button>
+  </div>
+  <!-- Device area. position:relative so absolute overlays anchor here. -->
+  <div id="emu-device"
+       style="position:relative;width:100%;aspect-ratio:609/1035;">
+    <!-- Background image: the real product rendering. -->
+    <img src="pbcp.png" alt=""
+         draggable="false"
+         style="position:absolute;left:0;top:0;
+                width:100%;height:100%;
+                pointer-events:none;
+                user-select:none;">
+    <!-- Pixel canvas: positioned exactly on the active display area
+         (the magenta-marked region in the annotated image). Measured:
+           bbox x=78..530 y=132..659 in a 609×1035 image
+           → left=12.81% top=12.75% w=74.22% h=50.92%
+         Aspect ratio of the box: 527/452 ≈ 1.166, matching 280/240
+         (the panel resolution).
+         The display has noticeably rounded corners on the real LCD --
+         the curve runs from y=132 to about y=190 at the top-left, so
+         the corner radius is roughly 58 px on a 452 px wide box, i.e.
+         12.8% of the display width (or 11.0% of the height). CSS
+         border-radius accepts horizontal/vertical pairs to keep the
+         curve circular even when the box isn't square. -->
+    <canvas id="emu-display" width="240" height="280"
+            style="position:absolute;
+                   left:12.81%;top:12.75%;width:74.22%;height:50.92%;
+                   border-radius:12.8% / 11%;
+                   image-rendering:pixelated;
+                   pointer-events:none;
+                   z-index:5;"></canvas>
+    <!-- Status LEDs: positioned on the LED bodies (the middle band of
+         each SMD package, between the two solder pads). Measured from
+         the user-supplied annotated image (#00FFFF markers):
+           red    centre (33, 216)  →  (5.42%, 20.82%)
+           yellow centre (33, 386)  →  (5.42%, 37.34%)
+           green  centre (33, 558)  →  (5.42%, 53.96%)
+         Marker box was 12×13 px (1.97% × 1.26%) but the actual LED
+         lens is a touch bigger; size to ~2.6%×1.8% so the lit colour
+         fills the visible LED shape. -->
+    <div id="emu-led-red"
+         style="position:absolute;left:4.4%;top:20.2%;
+                width:2%;height:1.3%;border-radius:15%;
+                background:#3a0a0a;opacity:0.55;
+                box-shadow:inset 0 0 2px rgba(0,0,0,0.5);"></div>
+    <div id="emu-led-yellow"
+         style="position:absolute;left:4.4%;top:36.7%;
+                width:2%;height:1.3%;border-radius:15%;
+                background:#3a3a0a;opacity:0.55;
+                box-shadow:inset 0 0 2px rgba(0,0,0,0.5);"></div>
+    <div id="emu-led-green"
+         style="position:absolute;left:4.4%;top:53.3%;
+                width:2%;height:1.3%;border-radius:15%;
+                background:#0a3a0a;opacity:0.55;
+                box-shadow:inset 0 0 2px rgba(0,0,0,0.5);"></div>
+    <!-- RGB status LED: positioned in the CENTRE of the "+" character
+         of the "PBC+" logo. The + has its centre at (323, 734) on the
+         609×1035 crop, i.e. (53.04%, 70.92%). Because the + itself is
+         white, the off-state of the LED must blend in (also white-ish)
+         and the lit state must clearly contrast. We use a small dot
+         that disappears against the white "+" when off, and lights up
+         brightly when rgb_led() is called. -->
+    <div id="emu-rgb"
+         style="position:absolute;left:51.7%;top:70%;
+                width:2.6%;height:1.6%;border-radius:50%;
+                background:transparent;
+                box-shadow:none;"></div>
+    <!-- Click targets for the joystick directions. The joystick cap
+         spans roughly x:115..185 y:855..930 in the crop, so each
+         arm sits just outside the cap. -->
+    <div id="emu-hit-up"     class="emu-hit"
+         style="position:absolute;left:18%;top:78%;width:13%;height:5%;
+                cursor:pointer;"></div>
+    <div id="emu-hit-down"   class="emu-hit"
+         style="position:absolute;left:18%;top:90.5%;width:13%;height:5%;
+                cursor:pointer;"></div>
+    <div id="emu-hit-left"   class="emu-hit"
+         style="position:absolute;left:12%;top:83%;width:6%;height:10%;
+                cursor:pointer;"></div>
+    <div id="emu-hit-right"  class="emu-hit"
+         style="position:absolute;left:31%;top:83%;width:6%;height:10%;
+                cursor:pointer;"></div>
+    <div id="emu-hit-center" class="emu-hit"
+         style="position:absolute;left:21%;top:84%;width:7%;height:6%;
+                border-radius:50%;cursor:pointer;"></div>
+    <!-- A and B button click targets. Buttons in the crop: A at
+         (~368, 905) -> (60.4%, 87.4%); B at (~517, 905) ->
+         (84.9%, 87.4%). Make targets generous (~10%) so a fat
+         finger / mouse hits reliably. -->
+    <div id="emu-hit-a" class="emu-hit"
+         style="position:absolute;left:55%;top:84%;width:11%;height:8%;
+                border-radius:50%;cursor:pointer;"></div>
+    <div id="emu-hit-b" class="emu-hit"
+         style="position:absolute;left:79%;top:84%;width:11%;height:8%;
+                border-radius:50%;cursor:pointer;"></div>
+  </div>
+  <div style="padding:6px 10px;font-size:11px;color:var(--fg-2);
+              text-align:center;border-top:1px solid var(--border);
+              background:var(--bg-2);border-radius:0 0 9px 9px;">
+    Steuerung: Pfeile · A · B · Leertaste
+  </div>
+  <!-- Tilt pad for the tilt sensor: drag the dot = tilt the device
+       (dot to the right = right edge lower), double click = flat.
+       Hidden until a program uses accel_… (emuNeigungAnzeigen). -->
+  <div id="emu-neigung" style="display:none;align-items:center;gap:10px;
+       padding:6px 10px;font-size:11px;color:var(--fg-2);
+       border-top:1px solid var(--border);background:var(--bg-2);">
+    <div id="emu-neigung-feld" title="Ziehen = Gerät kippen, Doppelklick = flach hinlegen"
+         style="position:relative;width:54px;height:54px;flex:0 0 auto;border-radius:50%;
+                border:1px solid var(--border);background:var(--bg-3);cursor:grab;touch-action:none;">
+      <div style="position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed var(--border);"></div>
+      <div style="position:absolute;top:50%;left:0;right:0;border-top:1px dashed var(--border);"></div>
+      <div id="emu-neigung-punkt" style="position:absolute;width:12px;height:12px;border-radius:50%;
+           background:var(--accent, #4aa3ff);left:21px;top:21px;pointer-events:none;"></div>
+    </div>
+    <div style="flex:1;line-height:1.35;">
+      <b style="color:var(--fg-1);">Neigungssensor</b><br>
+      Punkt ziehen = kippen,<br>Doppelklick = flach
+      <div id="emu-neigung-werte" style="font-family:ui-monospace,monospace;">x 0.00 y 0.00 z 1.00 g</div>
+    </div>
+  </div>
+  <div id="emu-text-warning"
+       style="display:none;margin:8px;padding:8px;
+              background:var(--bg-3);border-left:3px solid var(--warn);
+              color:var(--fg-1);font-size:11px;border-radius:4px;">
+    <strong>Hinweis:</strong> Der Emulator führt MicroPython im Browser aus.
+    Manche Funktionen sind eingeschränkt: <code>machine</code>-Modul,
+    exakte <code>time.sleep</code>-Genauigkeit, hardwarespezifische Tricks.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Emulator images modal: list of images stored in the browser. -->
+<!-- ============================================================ -->
+<div class="modal-bg" id="emu-images-modal">
+  <div class="modal" style="min-width:480px;max-width:600px;">
+    <h2 style="margin-top:0;">Bilder im Browser</h2>
+    <div style="font-size:12px;color:var(--fg-2);margin-bottom:12px;">
+      Diese Bilder sind im Browser gespeichert (nicht auf einem Gerät)
+      und stehen dem Emulator zur Verfügung.
+    </div>
+    <div id="emu-images-list"
+         style="max-height:50vh;overflow:auto;
+                border:1px solid var(--border);border-radius:4px;
+                padding:6px;background:var(--bg-2);"></div>
+    <div class="modal-foot">
+      <button class="tb-btn" id="emu-images-close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div class="boot-error" id="boot-error"></div>
+

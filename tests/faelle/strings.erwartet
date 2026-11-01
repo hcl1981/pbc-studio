@@ -1,0 +1,6 @@
+time.sleep(5) und pbc.delay(3) und pbc.sprite('x.png')
+mehrzeilig
+pbc.wait_for_button() time.sleep_ms(9)
+a
+    for x in y:
+b

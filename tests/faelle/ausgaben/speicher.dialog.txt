@@ -1,0 +1,1 @@
+Nicht genug Speicher Das Programm hat den Speicher des Geräts überfüllt. Häufige Ursachen: • Zu viele Bilder oder Sprites gleichzeitig aktiv. • Sehr lange Listen im Programm. • Mehrere Canvas-Objekte angelegt (jedes belegt rund 134 KB). Probiere weniger Bilder gleichzeitig zu benutzen, oder lege nur ein Canvas an. OK

@@ -1,0 +1,1 @@
+Zeichen-Position außerhalb Du hast ein Zeichen an einer Stelle angesprochen, die es im Text nicht gibt. Positionen gehen von 0 bis Länge-1. OK

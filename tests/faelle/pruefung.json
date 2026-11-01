@@ -1,0 +1,101 @@
+{
+ "konstruktor.py": {
+  "tasten": false
+ },
+ "verschachtelt.py": {
+  "tasten": false
+ },
+ "strings.py": {
+  "tasten": false
+ },
+ "mehrzeilig_def.py": {
+  "tasten": false
+ },
+ "mehrzeilig.py": {
+  "tasten": false
+ },
+ "einrueckung.py": {
+  "tasten": false
+ },
+ "turtles.py": {
+  "tasten": false
+ },
+ "eingabe.py": {
+  "tasten": false,
+  "fehler": "IndexError",
+  "schritte": [
+   {
+    "eingabe": "hallo"
+   },
+   {
+    "eingabe": "41"
+   },
+   {
+    "eingabe": "x"
+   }
+  ]
+ },
+ "ohne_rumpf.py": {
+  "tasten": false,
+  "fehler": "SyntaxError"
+ },
+ "canvas_fill.py": {
+  "tasten": false,
+  "fehler": "keyword"
+ },
+ "datei_fehlt.py": {
+  "tasten": false,
+  "fehler": "ENOENT"
+ },
+ "int_text.py": {
+  "tasten": false,
+  "fehler": "ValueError"
+ },
+ "text_zahl.py": {
+  "tasten": false,
+  "fehler": "TypeError"
+ },
+ "remove.py": {
+  "tasten": false,
+  "fehler": "ValueError"
+ },
+ "ohne_import.py": {
+  "tasten": false,
+  "fehler": "NameError"
+ },
+ "ohne_import_time.py": {
+  "tasten": false,
+  "fehler": "NameError"
+ },
+ "komma_koordinate.py": {
+  "tasten": false,
+  "fehler": "TypeError"
+ },
+ "sensor.py": {
+  "tasten": false
+ },
+ "datei_bleibt_a.py": {
+  "tasten": false
+ },
+ "datei_bleibt_b.py": {
+  "tasten": false,
+  "vorher": [
+   "datei_bleibt_a.py"
+  ]
+ },
+ "speicher.py": {
+  "tasten": false,
+  "fehler": "MemoryError"
+ },
+ "speicher_canvas.py": {
+  "tasten": false,
+  "fehler": "MemoryError"
+ },
+ "speicher_frei.py": {
+  "tasten": false
+ },
+ "turtle_kreuzung.py": {
+  "tasten": false,
+  "dauer": 60000
+ }
+}

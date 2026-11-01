@@ -1,0 +1,7 @@
+1 Canvas ok
+2 Canvas ok
+3 Canvas ok
+
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+MemoryError: memory allocation failed, allocating 134400 bytes

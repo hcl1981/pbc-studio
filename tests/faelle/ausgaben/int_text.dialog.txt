@@ -1,0 +1,1 @@
+Eingabe ist keine Zahl Das Programm hat eine Zahl erwartet, aber etwas anderes bekommen (z.B. Buchstaben). Tippe nur Ziffern ein. OK

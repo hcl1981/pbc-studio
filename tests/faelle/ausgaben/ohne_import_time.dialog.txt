@@ -1,0 +1,1 @@
+Unbekannter Name Das Programm kennt den Namen "time" nicht. Schreibe ganz oben in dein Programm die Zeile import time OK

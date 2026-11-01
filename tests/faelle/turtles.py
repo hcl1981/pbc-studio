@@ -1,0 +1,17 @@
+import turtle
+import pbc
+a = turtle.Turtle()
+a.speed(0)
+a.setPenColor(pbc.RED)
+a.forward(60)
+b = turtle.Turtle()
+b.speed(0)
+b.setPosition(-60, -60)
+b.setPenColor(pbc.GREEN)
+b.forward(40)
+a.right(90)
+a.forward(40)
+b.moveTo(-60, 60)
+a.setPosition(50, -80)
+a.forward(20)
+print(a.on_color(pbc.BLACK))

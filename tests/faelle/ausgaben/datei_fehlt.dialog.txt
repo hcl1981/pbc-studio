@@ -1,0 +1,1 @@
+Datei nicht gefunden Das Programm wollte eine Datei öffnen, die es nicht gibt. Prüfe den Dateinamen – oder schreibe die Datei zuerst. Ein Bild muss vorher mit „Dateien → Bilder verwalten…“ hochgeladen sein. OK

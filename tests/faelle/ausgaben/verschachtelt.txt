@@ -1,0 +1,4 @@
+4 22
+Text doppel(3) und .wert()
+21 10
+[0, 2, 4] 6

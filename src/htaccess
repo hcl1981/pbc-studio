@@ -1,0 +1,17 @@
+# PBC+ Studio: cross-origin isolation for the worker emulator.
+# With these two headers the browser provides SharedArrayBuffer, and
+# PBC+ Studio runs programs in a Web Worker (real sleep/input, Stop
+# works for every program). Without them, PBC+ Studio still works and
+# uses its older emulator.
+# "credentialless" (not "require-corp"): external files without
+# CORP/CORS headers -- Blockly's icons and sounds -- still load,
+# just without cookies.
+<IfModule mod_headers.c>
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Embedder-Policy "credentialless"
+</IfModule>
+
+# The page embeds MicroPython; compressed it is about half the size.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html
+</IfModule>

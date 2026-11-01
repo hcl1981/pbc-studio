@@ -1,0 +1,1 @@
+Falscher Typ Du rechnest oder verbindest vermutlich Text mit Zahlen. Wandle Zahlen mit "str(...)" in Text um, bevor du sie mit + an Text hängst – oder mit "int(...)" andersherum. OK

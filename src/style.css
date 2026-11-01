@@ -1,0 +1,776 @@
+  :root {
+    --bg-0: #0e1116;  --bg-1: #161b22;  --bg-2: #1f2630;  --bg-3: #2a323e;
+    --border: #2d3744;
+    --fg-0: #e6edf3;  --fg-1: #afbac4;  --fg-2: #7d8893;
+    --accent: #4f9eff; --accent-hover: #6cb0ff; --accent-dim: #2f5680;
+    --danger: #e0556a; --danger-hover: #ec6f81; --danger-dim: #803040;
+    --good: #3fb950; --warn: #d29922; --bad: #f85149;
+    --sidebar-w: 270px;
+    --titlebar-h: 52px;
+    --terminal-h: 200px;
+    --code-w-collapsed: 32px;
+    --code-w-open: 760px;
+    --footer-h: 26px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, Helvetica, Arial, sans-serif;
+    color: var(--fg-0); background: var(--bg-0); font-size: 14px;
+  }
+  button { font-family: inherit; }
+
+  .app {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--titlebar-h) 1fr var(--terminal-h);
+    grid-template-areas:
+      "title    title"
+      "sidebar  main"
+      "sidebar  terminal";
+    height: calc(100vh - var(--footer-h));
+  }
+  /* Page footer with legal/contact links. */
+  .page-footer {
+    height: var(--footer-h);
+    display: flex; align-items: center; justify-content: center;
+    gap: 18px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .page-footer a {
+    color: var(--fg-2); text-decoration: none; cursor: pointer;
+  }
+  .page-footer a:hover { color: var(--accent); text-decoration: underline; }
+
+  /* ---- Title bar ----
+     The titlebar is split into two zones that line up with the
+     workspace grid below:
+       - left zone (sidebar-w wide): logo + product name, sitting
+         visually on top of the sidebar.
+       - right zone (the rest): action buttons, starting flush with
+         the left edge of the workspace.
+     The titlebar-divider is a vertical hairline at exactly the
+     sidebar-right-border position so the eye reads "one column on
+     the left, action area on the right". */
+  .titlebar {
+    grid-area: title;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0;
+  }
+  .titlebar-left {
+    width: var(--sidebar-w);
+    height: 100%;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  .titlebar-right {
+    flex: 1;
+    display: flex; align-items: center; gap: 8px;
+    /* Padding 0 on the left so the "Dateien" button sits flush
+       against the imagined extension of the sidebar/workspace
+       divider. Padding 8 px on the right -- same as the gap
+       between the four right-side buttons -- so the rightmost
+       button has the same breathing room from the edge as it
+       has from its neighbour. */
+    padding: 0 8px 0 0;
+  }
+  .logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #4f9eff, #b54fff);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; color: white;
+  }
+  .logo-text { font-weight: 600; font-size: 15px; }
+  .titlebar-spacer { flex: 1; }
+
+  .tb-btn {
+    background: var(--bg-2); color: var(--fg-0);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 12px; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    font-size: 13px;
+  }
+  .tb-btn:hover { background: var(--bg-3); border-color: var(--border); }
+  .tb-btn:active { background: var(--bg-1); }
+  .tb-btn:disabled,
+  .tb-btn[disabled] {
+    color: var(--fg-2);
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .tb-btn:disabled:hover {
+    background: var(--bg-2); border-color: var(--border);
+  }
+  .tb-btn.primary {
+    background: var(--accent-dim); border-color: var(--accent); color: white;
+  }
+  .tb-btn.primary:hover { background: var(--accent); }
+  .tb-btn.danger {
+    background: var(--danger-dim); border-color: var(--danger); color: white;
+  }
+  .tb-btn.danger:hover { background: var(--danger); }
+
+  /* Dropdown menu used by the "Dateien" toolbar entry. The container
+     is positioned relative so the menu floats below it; menu shows
+     on .open. */
+  .dropdown { position: relative; display: inline-block; }
+  .dropdown-toggle { padding-right: 10px; }
+  .dropdown.open .dropdown-toggle {
+    background: var(--bg-3);
+    border-color: var(--accent-dim);
+  }
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px); left: 0;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    min-width: 220px;
+    padding: 4px;
+    z-index: 1000;
+  }
+  .dropdown.open .dropdown-menu { display: block; }
+  .dropdown-menu button {
+    display: block; width: 100%; text-align: left;
+    background: transparent; color: var(--fg-0);
+    border: 0; border-radius: 4px;
+    padding: 7px 12px;
+    font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .dropdown-menu button:hover { background: var(--bg-3); }
+  .dropdown-menu hr {
+    border: 0; border-top: 1px solid var(--border);
+    margin: 4px 2px;
+  }
+  .dropdown-section {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--fg-2);
+    padding: 6px 12px 2px;
+  }
+
+  /* Connection button: color reflects the ACTION the button will
+     trigger when clicked.
+       - default ("Verbinden"): green = positive, inviting action.
+       - .connected ("Trennen"): red = caution, destructive action.
+     A subtle matching tint in the background reinforces it. */
+  .conn-btn {
+    border-color: var(--good);
+    background: color-mix(in srgb, var(--good) 18%, var(--bg-2));
+    transition: background 0.2s, border-color 0.2s;
+    min-width: 100px;
+    text-align: center;
+  }
+  .conn-btn:hover {
+    background: color-mix(in srgb, var(--good) 30%, var(--bg-2));
+  }
+  .conn-btn.connected {
+    border-color: var(--bad);
+    background: color-mix(in srgb, var(--bad) 18%, var(--bg-2));
+  }
+  .conn-btn.connected:hover {
+    background: color-mix(in srgb, var(--bad) 30%, var(--bg-2));
+  }
+
+  /* ---- Target switch (PBC+ / Emulator) ---- */
+  .target-switch {
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    margin-right: 2px;
+  }
+  .target-opt {
+    appearance: none;
+    border: none;
+    background: var(--bg-2);
+    color: var(--fg-2);
+    font: inherit;
+    font-size: 13px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  /* invisible bold copy of the label: every option is as wide as when
+     it is active, so the bar does not shift when switching */
+  .target-opt::after {
+    content: attr(data-label);
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: 600;
+  }
+  .target-opt + .target-opt {
+    border-left: 1px solid var(--border);
+  }
+  .target-opt:hover { background: var(--bg-3); color: var(--fg-0); }
+  .target-opt.active {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* ---- Sidebar ---- */
+  .sidebar {
+    grid-area: sidebar;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; overflow-x: hidden;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  /* Block search box, pinned at the top of the sidebar. */
+  .blk-search-wrap {
+    position: sticky; top: 0; z-index: 5;
+    padding: 8px; background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+  }
+  .blk-search {
+    width: 100%; box-sizing: border-box;
+    background: var(--bg-2); color: var(--fg-0);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 28px 6px 10px; font-size: 12.5px;
+    outline: none;
+  }
+  .blk-search:focus { border-color: var(--accent-dim, #4a6); }
+  .blk-search::placeholder { color: var(--fg-2); }
+  .blk-search-wrap .blk-search-clear {
+    position: absolute; right: 16px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; color: var(--fg-2);
+    cursor: pointer; font-size: 15px; line-height: 1;
+    padding: 2px 4px; display: none;
+  }
+  .blk-search-wrap.has-text .blk-search-clear { display: block; }
+  /* When searching, a category whose body has no matches is hidden;
+     matching categories are force-shown regardless of open/closed. */
+  .cat.search-hidden { display: none; }
+  .blk-btn.search-hidden { display: none; }
+  .blk-search-empty {
+    padding: 12px; color: var(--fg-2); font-size: 12.5px;
+    text-align: center; display: none;
+  }
+  /* While a block is being dragged over the sidebar, tint the area
+     red to signal "drop here to delete". Matches the .danger button
+     accent so it reads as destructive without being shocking. */
+  .sidebar.trash-active {
+    background: color-mix(in srgb, var(--danger) 18%, var(--bg-1));
+    box-shadow: inset 0 0 0 2px var(--danger);
+  }
+
+  /* ---- Help sidebar (text mode) ----
+     The help sidebar reuses the block sidebar slot (.sidebar) but
+     renders different content: clickable text entries, not draggable
+     blocks. We give them a distinct visual treatment so it's clear
+     this isn't a block palette. */
+  .help-entry {
+    display: block;
+    width: calc(100% - 28px);
+    margin: 4px 14px;
+    padding: 6px 10px;
+    background: transparent;
+    color: var(--fg-0);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .help-entry:hover {
+    background: var(--bg-2);
+    border-color: var(--border);
+  }
+  .help-entry.active {
+    background: color-mix(in srgb, var(--accent) 20%, var(--bg-1));
+    border-color: var(--accent);
+  }
+  /* "Über X" entries sit one half-step out from the regular topic
+     buttons -- pulled to the left edge, italic, in fg-2 grey -- so
+     they read as overview labels rather than commands. */
+  .help-entry.intro {
+    margin-left: 4px;
+    width: calc(100% - 18px);
+    padding-left: 4px;
+    font-style: italic;
+    color: var(--fg-2);
+  }
+  .help-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 14px;
+  }
+  .help-divider.long {
+    margin: 10px 0;       /* full width, like a section break */
+  }
+  .help-sec-header {
+    /* Like sec-header in the block sidebar, but WITHOUT the
+       border-top -- the divider element above it is the visual
+       break. Avoids the "two stripes in a row" effect. */
+    color: var(--fg-1); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; margin: 8px 14px 4px 14px;
+  }
+  .help-sec-header.clickable {
+    cursor: pointer;
+    transition: color 0.1s;
+  }
+  .help-sec-header.clickable:hover {
+    color: var(--fg-0);
+  }
+
+  /* ---- Help panel (right side, in text mode) ---- */
+  .helppane {
+    width: 380px;
+    flex-shrink: 0;
+    background: var(--bg-1);
+    border-left: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .helppane[hidden] { display: none !important; }
+  .helppane-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .helppane-header .close {
+    margin-left: auto;
+    background: transparent;
+    color: var(--fg-1);
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  .helppane-header .close:hover { color: var(--fg-0); }
+  .helppane-body {
+    flex: 1; overflow-y: auto;
+    padding: 14px 18px;
+    font-size: 13px; line-height: 1.5;
+    color: var(--fg-0);
+  }
+  .helppane-body h3 {
+    margin: 0 0 8px 0; font-size: 15px;
+  }
+  .helppane-body p { margin: 0 0 10px 0; }
+  .helppane-body ul, .helppane-body ol {
+    margin: 6px 0 10px 20px; padding: 0;
+  }
+  .helppane-body li { margin-bottom: 4px; }
+  .helppane-body code {
+    background: var(--bg-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+  }
+  .helppane-body pre {
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    margin: 8px 0 12px 0;
+  }
+  .helppane-body pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 12px;
+    color: var(--fg-0);
+  }
+  .helppane-signature {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    margin: 4px 0 12px 0;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .helppane-insert {
+    margin-top: 6px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .helppane-insert:hover { filter: brightness(1.1); }
+  .sidebar::-webkit-scrollbar { width: 8px; }
+  .sidebar::-webkit-scrollbar-track { background: var(--bg-1); }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+
+  .cat { border-bottom: 1px solid var(--border); }
+  .cat-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; cursor: pointer; user-select: none;
+    color: var(--fg-0); font-weight: 500;
+    transition: background 0.1s;
+  }
+  .cat-header:hover { background: var(--bg-2); }
+  .cat-icon {
+    width: 22px; height: 22px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0; color: #fff;
+  }
+  .cat-toggle { margin-left: auto; color: var(--fg-2); font-size: 12px;
+                transition: transform 0.2s; }
+  .cat.open .cat-toggle { transform: rotate(90deg); }
+  .cat-body { display: none; padding: 4px 8px 10px 8px; }
+  .cat.open .cat-body { display: block; }
+
+  /* Comment entry at rubric level: looks like a category header but
+     IS the draggable block itself (no collapsible body). Keep the
+     pointer cursor and hover -- it's interactive, unlike a real
+     category header which only toggles. */
+  .cat-rubric-entry > .cat-header { cursor: grab; }
+  .cat-rubric-entry > .cat-header:active { cursor: grabbing; }
+
+  /* Simple text-style sidebar entries -- a thin colored swatch on the
+     left as a category cue, no block-like decoration. */
+  .blk-btn {
+    display: block; width: 100%; text-align: left;
+    background: var(--bg-2); color: var(--fg-0);
+    border: 1px solid transparent; border-radius: 5px;
+    padding: 6px 10px; margin: 3px 0; cursor: pointer;
+    font-size: 12.5px; line-height: 1.3;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .blk-btn:hover  { background: var(--bg-3); border-color: var(--accent-dim); }
+  .blk-btn:active { transform: translateY(1px); }
+  .blk-btn .blk-color {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 8px; vertical-align: middle;
+  }
+
+  /* Section headers and notes used inside categories with sub-lists. */
+  .sec-header {
+    color: var(--fg-1); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; margin: 12px 4px 4px 4px;
+    padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .sec-header:first-child { border-top: none; padding-top: 0; margin-top: 4px; }
+  .sec-note {
+    color: var(--fg-2); font-size: 12px; padding: 4px 4px;
+    line-height: 1.4;
+  }
+
+  /* ---- Main area ---- */
+  .main {
+    grid-area: main;
+    display: flex; flex-direction: row;
+    position: relative; overflow: hidden;
+  }
+  .workspace {
+    flex: 1; position: relative; min-width: 0;
+    background: var(--bg-0);
+    overflow: hidden;
+  }
+  /* Both children fill the workspace and overlap; we switch them with
+     display:none in setMode(). Absolute positioning here ensures the
+     hidden one's leftover SVG can't bleed through. */
+  #blockly,
+  .text-wrap {
+    position: absolute; inset: 0;
+  }
+  #blockly { background: var(--bg-0); }
+  .text-editor {
+    width: 100%; flex: 1;
+    background: var(--bg-0); color: var(--fg-0);
+    border: 0; padding: 14px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 14px; line-height: 1.5;
+    resize: none; outline: none; tab-size: 4;
+  }
+  .text-editor[readonly] {
+    color: var(--fg-1);
+    background: var(--bg-1);
+  }
+  /* CodeMirror visual integration with our dark theme. Fills the
+     text-wrap below the banner and uses our monospace stack so it
+     blends in with the rest of the IDE. */
+  .CodeMirror {
+    flex: 1; height: auto !important;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 14px; line-height: 1.5;
+    background: var(--bg-0);
+  }
+  .cm-s-material-darker.CodeMirror {
+    background: var(--bg-0);
+  }
+  /* Indent guides: every 4-space indent level in the leading
+     whitespace gets a thin vertical line on its left edge (see the
+     overlay in ensureCodeEditor). The line is a background-image, not
+     a border, so it takes no width and doesn't shift the code. The
+     vertical padding stretches the background over the full line
+     height -- without it the line stops at the font's height and the
+     guides look dashed at line-height 1.5. Vertical padding on an
+     inline element doesn't grow the line box, so it may reach into
+     the neighbouring line; that's what joins the lines up. */
+  .CodeMirror .cm-indent-guide {
+    background-image: linear-gradient(to right,
+        #33404f 0, #33404f 1px, transparent 1px);
+    padding: 0.25em 0;
+  }
+  .cm-s-material-darker .CodeMirror-gutters {
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+  }
+  .CodeMirror-cursor {
+    border-left: 1.5px solid #4f9eff;
+  }
+  .text-wrap {
+    display: flex; flex-direction: column;
+    background: var(--bg-0);
+  }
+  /* The HTML5 [hidden] attribute would normally apply display:none,
+     but `.text-wrap { display: flex }` above wins by specificity.
+     Re-assert hidden here so the text editor is actually hidden in
+     block mode (otherwise it covers the Blockly canvas on first load). */
+  .text-wrap[hidden] { display: none !important; }
+  .text-banner {
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+  .text-banner.unlocked {
+    background: var(--accent-dim);
+  }
+  .text-banner #text-banner-msg {
+    flex: 1; color: var(--fg-1); font-size: 13px;
+  }
+  .text-banner.unlocked #text-banner-msg {
+    color: var(--fg-0); font-weight: 500;
+  }
+
+  .codepane {
+    width: var(--code-w-collapsed); flex-shrink: 0;
+    background: var(--bg-1); border-left: 1px solid var(--border);
+    display: flex; flex-direction: row;
+    transition: width 0.25s; overflow: hidden;
+  }
+  .codepane.open { width: var(--code-w-open); }
+  .codepane-tab {
+    width: var(--code-w-collapsed); flex-shrink: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-2); border-right: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .codepane-tab:hover { background: var(--bg-3); }
+  .codepane-tab span {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    color: var(--fg-1); font-size: 12px;
+    letter-spacing: 1.5px; text-transform: uppercase;
+  }
+  .codepane-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .codepane-header {
+    padding: 10px 14px; color: var(--fg-1); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+    border-bottom: 1px solid var(--border); background: var(--bg-2);
+  }
+  .codepane-content {
+    flex: 1; overflow: auto; padding: 12px 14px;
+    color: var(--fg-0);
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 12.5px; line-height: 1.5; white-space: pre;
+  }
+  .codepane-content::-webkit-scrollbar { width: 8px; height: 8px; }
+  .codepane-content::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+
+  /* ---- Terminal ---- */
+  .terminal-area {
+    grid-area: terminal; background: #000;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  /* drag strip on the top edge: moves the border between workspace and
+     terminal (js/90_seriell.js) */
+  .terminal-area { position: relative; }
+  .terminal-trenner {
+    position: absolute; left: 0; right: 0; top: -4px; height: 8px;
+    cursor: row-resize; z-index: 20; touch-action: none;
+  }
+  .terminal-trenner:hover, .terminal-trenner.zieht {
+    background: color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  body.trenner-zieht, body.trenner-zieht * { cursor: row-resize !important; user-select: none; }
+  .terminal-header {
+    background: var(--bg-2); padding: 6px 14px;
+    color: var(--fg-1); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .terminal-header button {
+    background: transparent; border: 0; cursor: pointer;
+    color: var(--fg-1); padding: 2px 8px; font-size: 11px; border-radius: 3px;
+  }
+  .terminal-header button:hover { background: var(--bg-3); color: var(--fg-0); }
+  #terminal { flex: 1; padding: 6px 8px; overflow: hidden; }
+
+  /* ---- Modals + toast ---- */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: none; align-items: center; justify-content: center;
+    /* Above Blockly's WidgetDiv / DropDownDiv (z-index ~99999) so a
+       field editor that was open when the modal launched can't float
+       on top of the dialog. */
+    z-index: 100000;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px;
+    min-width: 480px; max-width: 720px; max-height: 80vh;
+    display: flex; flex-direction: column;
+  }
+  .modal h2 { margin: 0 0 14px 0; font-size: 18px; }
+  .modal-body { flex: 1; overflow-y: auto; margin: 8px 0 16px 0; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 8px; }
+  .img-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px; border-radius: 6px;
+    background: var(--bg-2); margin-bottom: 6px;
+  }
+  .img-row .name {
+    flex: 1; color: var(--fg-0);
+    font-family: ui-monospace, monospace; font-size: 13px;
+  }
+  .img-row .size { color: var(--fg-2); font-size: 12px; }
+
+  .toast {
+    position: fixed; bottom: calc(var(--terminal-h) + 16px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-2); color: var(--fg-0);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 18px; font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    /* above the dialogs (z-index 100000), or a toast from inside one stays hidden */
+    z-index: 100020; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .toast.good { border-color: var(--good); }
+  .toast.warn { border-color: var(--warn); }
+  .toast.bad  { border-color: var(--bad); }
+
+  input[type=file].hidden { display: none; }
+
+  /* Boot error overlay */
+  .boot-error {
+    position: fixed; inset: 0; background: var(--bg-0);
+    color: var(--fg-0); padding: 60px;
+    font-family: ui-monospace, monospace; font-size: 14px;
+    z-index: 9999; display: none; white-space: pre-wrap;
+  }
+  .boot-error.show { display: block; }
+  .boot-error h1 {
+    color: var(--bad); margin-top: 0;
+    font-family: -apple-system, sans-serif;
+  }
+
+  /* Blockly attaches several helper layers (drag-surface, dropdown,
+     widget, tooltip) directly to <body> rather than into our #blockly
+     container. When we switch to text mode by toggling display:none
+     on #blockly, those helpers are left behind -- the user sees a
+     ghost block hovering over the code editor (typically the last
+     thing they clicked or hovered on). Force-hide them globally
+     while body.text-mode is set; cancelBlocklyGesture() also tells
+     Blockly to tear them down, but this CSS rule is the belt-and-
+     suspenders backup that catches stragglers. */
+  body.text-mode .blocklyDragSurface,
+  body.text-mode .blocklyWidgetDiv,
+  body.text-mode .blocklyDropDownDiv,
+  body.text-mode .blocklyTooltipDiv {
+    display: none !important;
+  }
+
+  /* Paint editor */
+  .paint-tool {
+    background: var(--bg-2);
+    color: var(--fg-0);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    /* Stack the icon on top of the label and centre both. We split
+       the label from the icon with an .icon child so the symbol can
+       render bigger than the text without distorting the row height,
+       and so flexbox can centre the whole stack regardless of label
+       length (Rechteck vs gefüllt vs Ellipse...). */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    line-height: 1.15;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .paint-tool .icon {
+    font-size: 16px;
+    line-height: 1;
+    /* Monochrome SVG-style symbols look better at this size; emoji
+       would render in colour on some platforms, which jumps out
+       compared to the surrounding text. Letting them inherit colour
+       keeps active/hover styling consistent. */
+    color: var(--fg-0);
+  }
+  .paint-tool:hover {
+    background: var(--bg-3);
+  }
+  .paint-tool.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--fg-0);
+  }
+  /* The colour-picker row holds a swatch + the "Radieren" toggle;
+     in that row the tool button stays single-line for compactness. */
+  .paint-tool.row {
+    flex-direction: row;
+    gap: 4px;
+    padding: 6px 10px;
+  }
+  /* Size preset buttons in the size-picker grid */
+  #paint-size-grid button {
+    background: var(--bg-2);
+    color: var(--fg-0);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+    font-family: ui-monospace, monospace;
+  }
+  #paint-size-grid button:hover {
+    background: var(--bg-3);
+    border-color: var(--accent);
+  }
+  #paint-size-grid button .preset-label {
+    font-family: inherit;
+    color: var(--fg-2);
+    font-size: 11px;
+    display: block;
+    margin-top: 4px;
+  }
+
+/* Editor: line of the last error (text mode) */
+.CodeMirror .cm-fehlerzeile { background: rgba(255, 80, 80, 0.22); }
+.CodeMirror-hints { z-index: 10050; font-family: ui-monospace, monospace; font-size: 13px; }
