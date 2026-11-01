@@ -4,8 +4,11 @@ Programmierumgebung im Browser für den PicoBoy Color Plus: Blöcke und Python,
 mit Emulator und Übertragung per USB. Online unter <https://pbcstudio.de>.
 
 Die Tests unter `tests/` erwarten daneben die Ordner `showcase_bloecke/` und
-`dokumentation/`, die nicht zu diesem Repository gehören. `kontakt.php` für das
-Kontaktformular liegt nur auf dem Webspace.
+`dokumentation/`, die nicht zu diesem Repository gehören.
+
+`src/kontakt.php` ist der Mail-Endpunkt des Kontaktformulars. Vor dem Hochladen
+oben in der Datei die Adressen `$TO` und `$FROM` eintragen; sie liegt neben
+`index.html` auf dem Webspace.
 
 Ergebnis ist wieder **eine einzige Datei**, die auf den Webspace kommt.
 
