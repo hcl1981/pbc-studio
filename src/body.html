@@ -345,20 +345,18 @@
       um sie zu überschreiben.
     </div>
     <!-- Block mode only: the device can hold the program in two forms.
-         Python runs there but can't become blocks again; a block
-         project is only carried along and opened in the Studio. -->
+         Both start from the menu on the PicoBoy; only the block
+         project opens as blocks again. Texts are set (and translated)
+         in openSaveDialog(). -->
     <div id="save-block-wahl" style="display:none;margin-bottom:14px;
          font-size:12.5px;line-height:1.45;color:var(--fg-0);">
       <label style="display:flex;gap:8px;padding:6px 0;cursor:pointer;">
-        <input type="radio" name="save-art" value=".py" checked>
-        <span><strong>Python-Programm (.py)</strong>: startet auf dem
-        PicoBoy, lässt sich aber nicht wieder als Blöcke öffnen.</span>
+        <input type="radio" name="save-art" value=".pbcp" checked>
+        <span id="save-art-pbcp"></span>
       </label>
       <label style="display:flex;gap:8px;padding:6px 0;cursor:pointer;">
-        <input type="radio" name="save-art" value=".pbcp">
-        <span><strong>Block-Projekt (.pbcp)</strong>: zum Mitnehmen und
-        Weiterbauen in PBC+ Studio. Auf dem PicoBoy starten lässt es
-        sich nicht.</span>
+        <input type="radio" name="save-art" value=".py">
+        <span id="save-art-py"></span>
       </label>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:8px;

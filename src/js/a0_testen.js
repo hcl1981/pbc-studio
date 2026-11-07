@@ -332,7 +332,7 @@ function findTurtleCommandsWithoutConstructor() {
 // (or main(3).py, ...) so we never destroy the user's launcher
 // without giving them a way back. The student gets a single click
 // solution: now the device boots straight into the launcher and
-// every .py file on it shows up as a runnable program.
+// every .py and .pbcp file on it shows up as a runnable program.
 async function installLauncher() {
   if (!serialPort) { toast(t('Erst verbinden.'), 'warn'); return; }
   const ok = confirm(
@@ -841,15 +841,16 @@ async function showManageFilesDialog() {
     uploadBtn.disabled = false;
     uploadBtn.textContent = '⬆  ' + t('Datei(en) oder ZIP hochladen…');
     if (ok && liste.some(f => /\.pbcp$/i.test(f.name))) {
-      const hinweis = t('Block-Projekte (.pbcp) laufen nicht direkt auf dem PicoBoy. Öffne sie in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien und speichere sie dann mit „Auf den PBC+…“. So wird daraus ein Python-Programm (.py), das du auf dem Gerät starten kannst.');
-      pbcpHinweis.textContent = hinweis;
-      pbcpHinweis.style.display = '';
-      term.write('\r\n\x1b[33m-- ' + hinweis + ' --\x1b[0m\r\n');
+      const hinweis = await pbcpFirmwareHinweis();
+      if (hinweis) {
+        pbcpHinweis.textContent = hinweis;
+        pbcpHinweis.style.display = '';
+      }
     }
     await refresh();
   });
 
-  // Stays until the dialog closes: .pbcp files need one more step.
+  // Stays until the dialog closes: old firmware does not list .pbcp.
   const pbcpHinweis = document.createElement('div');
   pbcpHinweis.style.cssText =
     'display:none; font-size:12.5px; line-height:1.45; margin-top:10px;' +
@@ -2233,7 +2234,15 @@ async function openSaveDialog() {
   cancelBlocklyGesture(); document.getElementById('save-modal').classList.add('show');
   document.getElementById('save-block-wahl').style.display =
     isTextMode ? 'none' : '';
-  if (isTextMode) document.querySelector('input[name="save-art"][value=".py"]').checked = true;
+  document.getElementById('save-art-pbcp').innerHTML =
+    '<strong>' + t('Block-Projekt (.pbcp)') + '</strong>: ' +
+    t('startet im Startmenü des PicoBoy und lässt sich in PBC+ Studio wieder als Blöcke öffnen.');
+  document.getElementById('save-art-py').innerHTML =
+    '<strong>' + t('Python-Programm (.py)') + '</strong>: ' +
+    t('nur der Python-Code, zum Beispiel zum Weiterschreiben im Text-Modus. Lässt sich nicht wieder als Blöcke öffnen.');
+  // Blocks: the block project is the default, it can do everything.
+  document.querySelector('input[name="save-art"][value="' +
+                         (isTextMode ? '.py' : '.pbcp') + '"]').checked = true;
   // Suggest a default name. If we're in text mode and the user just
   // loaded something from the device, that filename is the obvious
   // default.
@@ -2264,11 +2273,11 @@ document.querySelectorAll('input[name="save-art"]').forEach(r => r.addEventListe
 async function refreshSaveDeviceList() {
   const list = document.getElementById('save-device-list');
   list.innerHTML = '<div style="color:var(--fg-2);text-align:center;' +
-                   'padding:24px;">Lade…</div>';
+                   'padding:24px;">' + t('Lade…') + '</div>';
   const alle = runTarget === 'emulator' ? await listEmuFilesRaw() : await listDeviceFilesRaw();
   if (!alle) {
     list.innerHTML = '<div style="color:var(--bad);padding:16px;">' +
-      'Auflisten fehlgeschlagen.</div>';
+      t('Auflisten fehlgeschlagen.') + '</div>';
     return;
   }
   const endung = saveEndung();
@@ -2276,7 +2285,7 @@ async function refreshSaveDeviceList() {
 
   if (files.length === 0) {
     list.innerHTML = '<div style="color:var(--fg-2);padding:16px;">' +
-      'Noch keine <code>' + endung + '</code>-Dateien auf dem Gerät.</div>';
+      t('Noch keine %1-Dateien auf dem Gerät.').replace('%1', '<code>' + endung + '</code>') + '</div>';
     return;
   }
 
@@ -2319,6 +2328,20 @@ document.getElementById('save-name').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') saveToDevice();
 });
 
+// The start menu runs block projects (.pbcp) since the firmware of
+// November 2026; pbc._pbcp_code marks it. With an older firmware on
+// the connected PBC+, tell the student (terminal) and return the
+// text, else null. The emulator has no start menu: nothing to say.
+async function pbcpFirmwareHinweis() {
+  if (runTarget === 'emulator' || !serialPort) return null;
+  const r = await runOnDevice(
+    "import pbc\nprint('PBCP', hasattr(pbc, '_pbcp_code'))\n", 5000);
+  if (!r || r.stderr || !/PBCP False/.test(r.stdout || '')) return null;
+  const hinweis = t('Auf deinem PBC+ ist noch eine ältere Firmware. Block-Projekte erscheinen dort erst nach einem Update im Startmenü: Dateien → MicroPython installieren…');
+  term.write('\r\n\x1b[33m-- ' + hinweis + ' --\x1b[0m\r\n');
+  return hinweis;
+}
+
 async function saveToDevice() {
   if (!(await ensureTargetReady())) return;
   let name = document.getElementById('save-name').value.trim();
@@ -2334,7 +2357,7 @@ async function saveToDevice() {
     if (s.textContent === name) overwrite = true;
   });
   if (overwrite &&
-      !confirm(`"${name}" gibt es schon auf dem PBC+. Überschreiben?`)) {
+      !confirm(t('„%1“ gibt es schon auf dem PBC+. Überschreiben?').replace('%1', name))) {
     return;
   }
 
@@ -2345,7 +2368,9 @@ async function saveToDevice() {
     // for one Python literal on the device.
     if (await uploadBlob(new Blob([projektText()]), name)) {
       setzeDateiname(name);
-      term.write('\r\n\x1b[33m-- ' + t('Dein Block-Projekt ist auf dem PicoBoy gespeichert und kommt so mit dir. Starten lässt es sich dort nicht. Öffne es an einem beliebigen Rechner in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien.') + ' --\x1b[0m\r\n');
+      toast(name + ' ' + t('auf PBC+ gespeichert'), 'good');
+      term.write('\r\n\x1b[33m-- ' + t('Dein Block-Projekt ist auf dem PicoBoy gespeichert. Du startest es im Startmenü (Eintrag mit Blocksymbol) und öffnest es in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien wieder als Blöcke.') + ' --\x1b[0m\r\n');
+      await pbcpFirmwareHinweis();
     }
     return;
   }

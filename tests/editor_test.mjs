@@ -34,7 +34,7 @@ try {
     null, { timeout: 30000 });
   const text = await page.evaluate(() => { const b = term.buffer.active; let s = ''; for (let i = 0; i < b.length; i++) s += b.getLine(i).translateToString(true) + '\n'; return s; });
   pruefe(/Hinweis Zeile 4: pbc\.txt24 gibt es nicht\. Meintest du pbc\.text24\?/.test(text), 'Vorprüfung: Tippfehler mit Vorschlag');
-  pruefe(/Hinweis Zeile 5: "time" wird benutzt, aber nicht importiert/.test(text), 'Vorprüfung: fehlender Import');
+  pruefe(/Hinweis Zeile 5: „time“ wird benutzt, aber nicht importiert/.test(text), 'Vorprüfung: fehlender Import');
   // close the friendly hint dialog
   await page.evaluate(() => [...document.querySelectorAll('button')].filter((b) => /^OK$/.test(b.textContent.trim()) && b.offsetParent).forEach((b) => b.click()));
   const markiert = await page.evaluate(() => [...document.querySelectorAll('.CodeMirror .cm-fehlerzeile')].length);

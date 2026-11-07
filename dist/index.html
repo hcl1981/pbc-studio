@@ -1188,20 +1188,18 @@
       um sie zu überschreiben.
     </div>
     <!-- Block mode only: the device can hold the program in two forms.
-         Python runs there but can't become blocks again; a block
-         project is only carried along and opened in the Studio. -->
+         Both start from the menu on the PicoBoy; only the block
+         project opens as blocks again. Texts are set (and translated)
+         in openSaveDialog(). -->
     <div id="save-block-wahl" style="display:none;margin-bottom:14px;
          font-size:12.5px;line-height:1.45;color:var(--fg-0);">
       <label style="display:flex;gap:8px;padding:6px 0;cursor:pointer;">
-        <input type="radio" name="save-art" value=".py" checked>
-        <span><strong>Python-Programm (.py)</strong>: startet auf dem
-        PicoBoy, lässt sich aber nicht wieder als Blöcke öffnen.</span>
+        <input type="radio" name="save-art" value=".pbcp" checked>
+        <span id="save-art-pbcp"></span>
       </label>
       <label style="display:flex;gap:8px;padding:6px 0;cursor:pointer;">
-        <input type="radio" name="save-art" value=".pbcp">
-        <span><strong>Block-Projekt (.pbcp)</strong>: zum Mitnehmen und
-        Weiterbauen in PBC+ Studio. Auf dem PicoBoy starten lässt es
-        sich nicht.</span>
+        <input type="radio" name="save-art" value=".py">
+        <span id="save-art-py"></span>
       </label>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:8px;
@@ -1774,8 +1772,8 @@
 // by one with every build (no manual version bookkeeping needed). Shown
 // only in the terminal banner. APP_BUILD doubles as the internal build
 // marker, so there's a single source of truth.
-const APP_BUILD = 136;
-const APP_DATE  = '2026-11-01';   // build.py sets the day of the build
+const APP_BUILD = 137;
+const APP_DATE  = '2026-11-07';   // build.py sets the day of the build
 
 /* =====================================================================
  * Quiet Blockly's internal deprecation warning. Blockly 12's own
@@ -2132,6 +2130,7 @@ const I18N_EN = {
   'Zahl': 'Number',
   'Rechnen + − × ÷ %': 'Math + − × ÷ %',
   'Zufallszahl': 'Random number',
+  'Zufallszahl zwischen … und …': 'Random number between … and …',
   'wahr / falsch': 'true / false',
   'warten (ms)': 'wait (ms)',
   'Zeit seit Programmstart (ms)': 'Time since start (ms)',
@@ -2349,11 +2348,17 @@ const I18N_EN = {
     'You see every file on the device here. Upload new files or delete existing ones.',
   'Datei(en) hochladen…':           'Upload file(s)…',
   'Datei(en) oder ZIP hochladen…':  'Upload file(s) or ZIP…',
-  'Block-Projekte (.pbcp) laufen nicht direkt auf dem PicoBoy. Öffne sie in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien und speichere sie dann mit „Auf den PBC+…“. So wird daraus ein Python-Programm (.py), das du auf dem Gerät starten kannst.':
-    'Block projects (.pbcp) do not run directly on the PicoBoy. Open them in PBC+ Studio with “From the PBC+…” in the Files menu, then save them with “To the PBC+…”. This turns them into a Python program (.py) you can start on the device.',
+  'Auf deinem PBC+ ist noch eine ältere Firmware. Block-Projekte erscheinen dort erst nach einem Update im Startmenü: Dateien → MicroPython installieren…':
+    'Your PBC+ still has an older firmware. Block projects appear in its launcher only after an update: Files → Install MicroPython…',
+  'Block-Projekt (.pbcp)':          'Block project (.pbcp)',
+  'Python-Programm (.py)':          'Python program (.py)',
+  'startet im Startmenü des PicoBoy und lässt sich in PBC+ Studio wieder als Blöcke öffnen.':
+    'starts from the launcher on the PicoBoy and opens as blocks again in PBC+ Studio.',
+  'nur der Python-Code, zum Beispiel zum Weiterschreiben im Text-Modus. Lässt sich nicht wieder als Blöcke öffnen.':
+    'only the Python code, for example to keep writing in text mode. Does not open as blocks again.',
   'Keine Programme auf dem Gerät.': 'No programs on the device.',
-  'Dein Block-Projekt ist auf dem PicoBoy gespeichert und kommt so mit dir. Starten lässt es sich dort nicht. Öffne es an einem beliebigen Rechner in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien.':
-    'Your block project is saved on the PicoBoy and travels with you. It cannot run there. Open it on any computer in PBC+ Studio with “From the PBC+…” in the Files menu.',
+  'Dein Block-Projekt ist auf dem PicoBoy gespeichert. Du startest es im Startmenü (Eintrag mit Blocksymbol) und öffnest es in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien wieder als Blöcke.':
+    'Your block project is saved on the PicoBoy. Start it from the launcher (entry with the block icon) and open it as blocks again in PBC+ Studio with “From PBC+…” in the Files menu.',
   'Systemdatei':                    'system file',
   'Name doppelt':                   'duplicate name',
   'Ausgelassen:':                   'Skipped:',
@@ -2810,6 +2815,211 @@ const I18N_EN = {
   'fertig':                       'done',
   'Verbindung zum Gerät verloren':'Connection to device lost',
   'keine OK-Quittung':            'no OK acknowledgement',
+  // Added with build 137 (English pass over dialogs and messages).
+  "Definiert eine Funktion mit Rückgabewert. Ihr Aufruf lässt sich direkt in eine Wert-Lücke ziehen. Mit + fügst du Parameter hinzu.":
+    "Defines a function with a return value. Its call fits straight into a value slot. Use + to add parameters.",
+  "Definiert eine eigene Funktion. Mit + fügst du Parameter hinzu; rufe sie unten überall auf.":
+    "Defines your own function. Use + to add parameters; call it anywhere below.",
+  "Liest einen Parameter oder eine lokale Variable der Funktion.":
+    "Reads a parameter or a local variable of the function.",
+  "Erstellt eine lokale Variable, die nur in dieser Funktion gilt (kein \"global\" nötig).":
+    "Creates a local variable that only exists inside this function (no \"global\" needed).",
+  "Keine Funktionen.":
+    "No functions.",
+  "Überschreiben":
+    "Overwrite",
+  "Bitte zuerst den PBC+ per USB verbinden (Schalter auf PBC+).":
+    "Please connect the PBC+ via USB first (switch set to PBC+).",
+  "PBC+ → Emulator übertragen":
+    "Copy PBC+ → emulator",
+  "Emulator → PBC+ übertragen":
+    "Copy emulator → PBC+",
+  "Dateien auswählen, die vom Gerät in den Emulator kopiert werden.":
+    "Choose the files to copy from the device into the emulator.",
+  "Dateien auswählen, die aus dem Emulator auf das Gerät kopiert werden.":
+    "Choose the files to copy from the emulator onto the device.",
+  "Übertragen":
+    "Copy",
+  "Keine Dateien gefunden.":
+    "No files found.",
+  "überschreibt":
+    "overwrites",
+  "Überschreiben bestätigen":
+    "Confirm overwrite",
+  "Diese Dateien existieren am Ziel bereits und werden überschrieben:":
+    "These files already exist at the destination and will be overwritten:",
+  "Fortfahren?":
+    "Proceed?",
+  "Fertig":
+    "Done",
+  "Datei(en) übertragen":
+    "file(s) copied",
+  "übertragen":
+    "copied",
+  "fehlgeschlagen":
+    "failed",
+  "Zeichen-Position außerhalb":
+    "Character position out of range",
+  "Du hast ein Zeichen an einer Stelle angesprochen, die es im Text nicht gibt. Positionen gehen von 0 bis Länge-1.":
+    "You asked for a character at a position the text does not have. Positions go from 0 to length-1.",
+  "Ungültiger Wert":
+    "Invalid value",
+  "Das gesuchte Element ist nicht in der Liste. Prüfe vorher mit \"in\", ob es darin vorkommt.":
+    "The element you are looking for is not in the list. Check first with \"in\" whether it is there.",
+  "Die Liste ist leer – davon gibt es kein Minimum oder Maximum.":
+    "The list is empty – it has no minimum or maximum.",
+  "Ein Wert passt nicht zu dieser Funktion. Schau in die rote Fehlermeldung im Terminal, um zu sehen welcher.":
+    "A value does not fit this function. Look at the red error message in the terminal to see which one.",
+  "Datei nicht gefunden":
+    "File not found",
+  "Das Programm wollte eine Datei öffnen, die es nicht gibt. Prüfe den Dateinamen – oder schreibe die Datei zuerst. Ein Bild muss vorher mit „Dateien → Bilder verwalten…“ hochgeladen sein.":
+    "The program tried to open a file that does not exist. Check the file name – or write the file first. An image has to be uploaded with “Files → Manage images…” first.",
+  "Der Emulator konnte nicht geladen werden":
+    "The emulator could not be loaded",
+  "Zuerst mit dem Gerät verbinden.":
+    "Connect to the device first.",
+  "(keine Funktion)":
+    "(no function)",
+  "Sprite löschen":
+    "Delete sprite",
+  "Sprite „%1“ löschen?":
+    "Delete sprite “%1”?",
+  "— Noch keine Bilder hochgeladen —":
+    "— No images uploaded yet —",
+  "Lade ein Bild über das Menü <em>Dateien ▾ → Bilder verwalten…</em> hoch und versuche es erneut.":
+    "Upload an image via <em>Files ▾ → Manage images…</em> and try again.",
+  "konnte nicht erstellt werden:":
+    "could not be created:",
+  "Programme laufen unverändert in einem eigenen Thread, mit so viel Speicher wie auf dem PicoBoy.":
+    "Programs run unchanged in their own thread, with as much memory as on the PicoBoy.",
+  "Nicht verfügbar: Der Webserver sendet die nötigen Header nicht (siehe .htaccess).":
+    "Not available: the web server does not send the required headers (see .htaccess).",
+  "Schreibgeschützt. Aktiviere die Bearbeitung, um Python direkt zu ändern.":
+    "Read-only. Enable editing to change the Python code directly.",
+  "Wenn du jetzt zu den Blöcken zurückwechselst, gehen alle Änderungen am Python-Code verloren. Die Blöcke überschreiben den Editor-Inhalt.\n\nWirklich zurückwechseln?":
+    "If you switch back to blocks now, all changes to the Python code are lost. The blocks overwrite the editor content.\n\nReally switch back?",
+  "Wenn du die Python-Bearbeitung aktivierst, geht der Weg NUR IN EINE RICHTUNG:\n\n  Blöcke  →  Python (jetzt)\n  Python  →  Blöcke ist NICHT möglich.\n\nDu kannst zwar zurück zu den Blöcken wechseln, aber dann gehen deine Python-Änderungen verloren.\n\nFortfahren?":
+    "Enabling Python editing is a ONE-WAY street:\n\n  Blocks  →  Python (now)\n  Python  →  Blocks is NOT possible.\n\nYou can switch back to blocks, but then your Python changes are lost.\n\nProceed?",
+  "Python-Bearbeitung aktiv. Zurück zu Blöcken bedeutet Datenverlust.":
+    "Python editing active. Going back to blocks loses your changes.",
+  "„%1“ wird benutzt, aber nicht importiert. Schreibe oben: import %1":
+    "“%1” is used but not imported. Add at the top: import %1",
+  "%1 gibt es nicht.":
+    "%1 does not exist.",
+  "Meintest du %1?":
+    "Did you mean %1?",
+  "Datei „%1“ wirklich vom PBC+ löschen?":
+    "Really delete file “%1” from the PBC+?",
+  "Das kann nicht rückgängig gemacht werden.":
+    "This cannot be undone.",
+  "Noch keine %1-Dateien auf dem Gerät.":
+    "No %1 files on the device yet.",
+  "„%1“ gibt es schon auf dem PBC+. Überschreiben?":
+    "“%1” already exists on the PBC+. Overwrite?",
+  "Mini-Sprite":
+    "mini sprite",
+  "kleines Sprite":
+    "small sprite",
+  "mittleres Sprite":
+    "medium sprite",
+  "großes Sprite":
+    "large sprite",
+  "ganzes Display":
+    "whole display",
+  "nicht verfügbar":
+    "not available",
+  "lade MicroPython…":
+    "loading MicroPython…",
+  "läuft":
+    "running",
+  "Fehler:":
+    "Error:",
+  "Noch keine Bilder. Lade welche über „Bilder verwalten…“ hoch oder zeichne welche mit „Bild zeichnen…“.":
+    "No images yet. Upload some via “Manage images…” or draw some with “Draw image…”.",
+  "„%1“ aus dem Browser löschen?":
+    "Delete “%1” from the browser?",
+  "Keine PNG-Dateien auf dem Gerät.":
+    "No PNG files on the device.",
+  "„%1“ wirklich löschen?":
+    "Really delete “%1”?",
+  "Öffnen":
+    "Open",
+  "Bild zeichnen…":
+    "Draw image…",
+  "Hier klicken und Hardware wünschen.":
+    "Click here to request hardware.",
+  "Dateien auf dem Gerät (nur":
+    "Files on the device (only",
+  "Hinweis: Vom PBC+ geladene Dateien landen im Text-Modus.":
+    "Note: files loaded from the PBC+ open in text mode.",
+  "Wähle einen Namen und ein Bild. Das Bild muss schon auf den PBC+ hochgeladen sein (oder per „Bilder verwalten…\").":
+    "Choose a name and an image. The image must already be uploaded to the PBC+ (or via “Manage images…”).",
+  "Bild:":
+    "Image:",
+  "Vorhandene Dateien (Klick = übernehmen + überschreiben):":
+    "Existing files (click = use name + overwrite):",
+  "Bilder auf dem PBC+":
+    "Images on the PBC+",
+  "Hochgeladene PNG-Dateien kannst du direkt auf dem Display anzeigen lassen (Block":
+    "You can show uploaded PNG files directly on the display (block",
+  "unter „Display\") oder als Sprite verwenden (Blöcke unter „Sprites\"). Zum Hoch- oder Anzeigen muss das Gerät verbunden sein.":
+    "under “Display”) or use them as sprites (blocks under “Sprites”). The device must be connected to upload or show them.",
+  "Farbe wählen":
+    "Choose colour",
+  "Bild bearbeiten und hochladen":
+    "Edit and upload image",
+  "Noch kein Bild geladen.":
+    "No image loaded yet.",
+  "Bild von der Festplatte wählen…":
+    "Choose image from disk…",
+  "Ausgabegröße":
+    "Output size",
+  "Maximal 240 × 280 (Display-Größe)":
+    "At most 240 × 280 (display size)",
+  "Seitenverhältnis beibehalten":
+    "Keep aspect ratio",
+  "Vorschau auf dem Display":
+    "Preview on the display",
+  "Tipp: Ziehe das blaue Rechteck zum Verschieben, die Ecken zum Verändern der Größe. Das Bild wird beim Hochladen auf die Ausgabegröße skaliert.":
+    "Tip: drag the blue rectangle to move it, its corners to resize. The image is scaled to the output size when uploading.",
+  "Anderes Bild…":
+    "Other image…",
+  "Neues Bild zeichnen":
+    "Draw new image",
+  "Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel gross; ein ganzes Display ist 240×280.":
+    "Choose the size of the image. Sprites are typically 16–48 pixels; a whole display is 240×280.",
+  "Höhe:":
+    "Height:",
+  "Bild zeichnen":
+    "Draw image",
+  "Rückgängig":
+    "Undo",
+  "Stärke":
+    "Width",
+  "Farbe":
+    "Colour",
+  "Wie möchtest du dein Programm ausführen?":
+    "How do you want to run your program?",
+  "PBC+ über USB":
+    "PBC+ via USB",
+  "Echtes Gerät, am Computer angeschlossen":
+    "Real device, connected to the computer",
+  "Virtueller PBC+ im Browser, kein Gerät nötig":
+    "Virtual PBC+ in the browser, no device needed",
+  "Der Emulator führt MicroPython im Browser aus. Manche Funktionen sind eingeschränkt:":
+    "The emulator runs MicroPython in the browser. Some functions are limited:",
+  "Bilder im Browser":
+    "Images in the browser",
+  "Diese Bilder sind im Browser gespeichert (nicht auf einem Gerät) und stehen dem Emulator zur Verfügung.":
+    "These images are stored in the browser (not on a device) and are available to the emulator.",
+  "Ziel wählen: echtes Gerät oder Emulator":
+    "Choose target: real device or emulator",
+  "Codeansicht ein-/ausblenden":
+    "Show/hide code view",
+  "Ziehen, um das Terminal größer oder kleiner zu machen":
+    "Drag to make the terminal bigger or smaller",
+  "Ziehen = Gerät kippen, Doppelklick = flach hinlegen":
+    "Drag = tilt device, double-click = lay flat",
 };
 
 function t(s) {
@@ -7303,7 +7513,7 @@ function methodNameOptions() {
   if (current && !seen.has(current)) {
     opts.unshift([current + ' (?)', current]);
   }
-  if (opts.length === 0) return [['(keine Funktion)', '']];
+  if (opts.length === 0) return [[t('(keine Funktion)'), '']];
   return opts;
 }
 
@@ -9690,13 +9900,13 @@ function renderSpriteButtons(body) {
           ` · ${sp.image}</span></span>`;
       const del = document.createElement('span');
       del.textContent = '×';
-      del.title = 'Sprite löschen';
+      del.title = t('Sprite löschen');
       del.style.cssText =
         'color:var(--danger);font-size:18px;line-height:1;' +
         'padding:0 6px;cursor:pointer;';
       del.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!confirm(`Sprite "${sp.name}" löschen?`)) return;
+        if (!confirm(t('Sprite „%1“ löschen?').replace('%1', sp.name))) return;
         PBC_SPRITES.splice(idx, 1);
         refreshSpritesCategory();
         updateCodeView();
@@ -9955,12 +10165,12 @@ function openNewSpriteDialog() {
   sel.innerHTML = '';
   if (KNOWN_IMAGES.length === 0) {
     const opt = document.createElement('option');
-    opt.textContent = '— Noch keine Bilder hochgeladen —';
+    opt.textContent = t('— Noch keine Bilder hochgeladen —');
     opt.value = '';
     sel.appendChild(opt);
     hint.innerHTML =
-      'Lade ein Bild über das Menü <em>Dateien ▾ → Bilder ' +
-      'verwalten…</em> hoch und versuche es erneut.';
+      t('Lade ein Bild über das Menü <em>Dateien ▾ → Bilder ' +
+        'verwalten…</em> hoch und versuche es erneut.');
   } else {
     KNOWN_IMAGES.forEach(name => {
       const opt = document.createElement('option');
@@ -10531,7 +10741,7 @@ function spawnBlock(type, fields, dropAt) {
     }
     return block;
   } catch (e) {
-    toast(type + ' konnte nicht erstellt werden: ' + e.message, 'bad');
+    toast(type + ' ' + t('konnte nicht erstellt werden:') + ' ' + e.message, 'bad');
     console.error(e);
     return null;
   }
@@ -11352,8 +11562,8 @@ document.getElementById('btn-settings').addEventListener('click', () => {
     const info = document.getElementById('settings-emu-info');
     const isoliert = typeof SharedArrayBuffer !== 'undefined' && self.crossOriginIsolated === true;
     if (info) info.textContent = isoliert
-      ? 'Programme laufen unverändert in einem eigenen Thread, mit so viel Speicher wie auf dem PicoBoy.'
-      : 'Nicht verfügbar: Der Webserver sendet die nötigen Header nicht (siehe .htaccess).';
+      ? t('Programme laufen unverändert in einem eigenen Thread, mit so viel Speicher wie auf dem PicoBoy.')
+      : t('Nicht verfügbar: Der Webserver sendet die nötigen Header nicht (siehe .htaccess).');
   }
   cancelBlocklyGesture(); document.getElementById('settings-modal').classList.add('show');
 });
@@ -11636,7 +11846,7 @@ function setMode(text, opts) {
       banner.style.display = '';
       banner.classList.remove('unlocked');
       document.getElementById('text-banner-msg').textContent =
-        'Schreibgeschützt. Aktiviere die Bearbeitung, um Python direkt zu ändern.';
+        t('Schreibgeschützt. Aktiviere die Bearbeitung, um Python direkt zu ändern.');
       document.getElementById('btn-edit-on').hidden = false;
     }
     document.getElementById('codeview').textContent =
@@ -11653,11 +11863,11 @@ function setMode(text, opts) {
     // switched back, no need to interrupt them.
     if (isTextMode && codeEditor) {
       const cur = codeEditor.getValue();
-      if (cur !== textBaseline && !confirm(
+      if (cur !== textBaseline && !confirm(t(
           'Wenn du jetzt zu den Blöcken zurückwechselst, gehen alle ' +
           'Änderungen am Python-Code verloren. Die Blöcke ' +
           'überschreiben den Editor-Inhalt.\n\n' +
-          'Wirklich zurückwechseln?')) {
+          'Wirklich zurückwechseln?'))) {
         return;
       }
     }
@@ -11683,13 +11893,13 @@ function setMode(text, opts) {
 // edits.
 function setupEditLockButton() {
   document.getElementById('btn-edit-on').addEventListener('click', () => {
-    if (!confirm(
+    if (!confirm(t(
         'Wenn du die Python-Bearbeitung aktivierst, geht der Weg ' +
         'NUR IN EINE RICHTUNG:\n\n' +
         '  Blöcke  →  Python (jetzt)\n' +
         '  Python  →  Blöcke ist NICHT möglich.\n\n' +
         'Du kannst zwar zurück zu den Blöcken wechseln, aber dann ' +
-        'gehen deine Python-Änderungen verloren.\n\nFortfahren?')) {
+        'gehen deine Python-Änderungen verloren.\n\nFortfahren?'))) {
       return;
     }
     if (codeEditor) {
@@ -11699,7 +11909,7 @@ function setupEditLockButton() {
     const banner = document.getElementById('text-banner');
     banner.classList.add('unlocked');
     document.getElementById('text-banner-msg').textContent =
-      'Python-Bearbeitung aktiv. Zurück zu Blöcken bedeutet Datenverlust.';
+      t('Python-Bearbeitung aktiv. Zurück zu Blöcken bedeutet Datenverlust.');
     document.getElementById('btn-edit-on').hidden = true;
   });
 }
@@ -11844,13 +12054,13 @@ function pyVorpruefung(src) {
       if (definiert.has(modul)) continue;          // a variable called e.g. "time"
       if (!importiert.has(modul) && !gemeldet.has('imp:' + modul)) {
         gemeldet.add('imp:' + modul);
-        warnungen.push({ zeile: i + 1, text: `"${modul}" wird benutzt, aber nicht importiert. Schreibe oben: import ${modul}` });
+        warnungen.push({ zeile: i + 1, text: t('„%1“ wird benutzt, aber nicht importiert. Schreibe oben: import %1').replace(/%1/g, modul) });
       }
       const bekannt = PY_MODUL_NAMEN[modul];
       if (bekannt && bekannt.indexOf(name) < 0 && !gemeldet.has(modul + '.' + name)) {
         gemeldet.add(modul + '.' + name);
         const v = pyVorschlag(name, bekannt);
-        warnungen.push({ zeile: i + 1, text: `${modul}.${name} gibt es nicht.` + (v ? ` Meintest du ${modul}.${v}?` : '') });
+        warnungen.push({ zeile: i + 1, text: t('%1 gibt es nicht.').replace('%1', modul + '.' + name) + (v ? ' ' + t('Meintest du %1?').replace('%1', modul + '.' + v) : '') });
       }
     }
   });
@@ -12057,12 +12267,14 @@ document.getElementById('btn-new').addEventListener('click', () => {
   updateCodeView();
 });
 
-// The current block program as the text of a .pbcp file.
+// The current block program as the text of a .pbcp file. "py" is the
+// complete program with its import lines: the start menu on the
+// PicoBoy runs it straight from the file.
 function projektText() {
   return JSON.stringify({
     kind: 'pbc-blocks',
     json: Blockly.serialization.workspaces.save(workspace),
-    py: generatedCode(),
+    py: fullProgram(),
     stringVars: Array.from(STRING_VAR_NAMES),
     canvasVars: Array.from(CANVAS_VAR_NAMES),
     sprites: PBC_SPRITES,
@@ -12184,7 +12396,7 @@ for n in sorted(os.listdir('/')):
       // deleting so a misclick can't wipe an hour of work.
       const del = document.createElement('button');
       del.textContent = '×';
-      del.title = 'Datei löschen';
+      del.title = t('Datei löschen');
       del.style.cssText =
         'background:transparent;color:var(--danger);' +
         'border:1px solid transparent;border-radius:4px;' +
@@ -12210,8 +12422,8 @@ for n in sorted(os.listdir('/')):
 
 async function deleteFromDevice(name) {
   if (!serialPort) { toast(t('Nicht verbunden'), 'bad'); return; }
-  if (!confirm(`Datei "${name}" wirklich vom PBC+ löschen?\n\n` +
-               'Das kann nicht rückgängig gemacht werden.')) {
+  if (!confirm(t('Datei „%1“ wirklich vom PBC+ löschen?').replace('%1', name) + '\n\n' +
+               t('Das kann nicht rückgängig gemacht werden.'))) {
     return;
   }
   const code = `
@@ -12225,7 +12437,7 @@ except Exception as e:
   const r = await runOnDevice(code, 4000);
   if (!r) return;
   if (r.stdout.trim().startsWith('OK')) {
-    toast(name + ' gelöscht', 'good');
+    toast(name + ' ' + t('gelöscht'), 'good');
     // Refresh the list in place by re-running the device-list query.
     document.getElementById('open-device-btn').click();
   } else {
@@ -13669,7 +13881,7 @@ function findTurtleCommandsWithoutConstructor() {
 // (or main(3).py, ...) so we never destroy the user's launcher
 // without giving them a way back. The student gets a single click
 // solution: now the device boots straight into the launcher and
-// every .py file on it shows up as a runnable program.
+// every .py and .pbcp file on it shows up as a runnable program.
 async function installLauncher() {
   if (!serialPort) { toast(t('Erst verbinden.'), 'warn'); return; }
   const ok = confirm(
@@ -14178,15 +14390,16 @@ async function showManageFilesDialog() {
     uploadBtn.disabled = false;
     uploadBtn.textContent = '⬆  ' + t('Datei(en) oder ZIP hochladen…');
     if (ok && liste.some(f => /\.pbcp$/i.test(f.name))) {
-      const hinweis = t('Block-Projekte (.pbcp) laufen nicht direkt auf dem PicoBoy. Öffne sie in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien und speichere sie dann mit „Auf den PBC+…“. So wird daraus ein Python-Programm (.py), das du auf dem Gerät starten kannst.');
-      pbcpHinweis.textContent = hinweis;
-      pbcpHinweis.style.display = '';
-      term.write('\r\n\x1b[33m-- ' + hinweis + ' --\x1b[0m\r\n');
+      const hinweis = await pbcpFirmwareHinweis();
+      if (hinweis) {
+        pbcpHinweis.textContent = hinweis;
+        pbcpHinweis.style.display = '';
+      }
     }
     await refresh();
   });
 
-  // Stays until the dialog closes: .pbcp files need one more step.
+  // Stays until the dialog closes: old firmware does not list .pbcp.
   const pbcpHinweis = document.createElement('div');
   pbcpHinweis.style.cssText =
     'display:none; font-size:12.5px; line-height:1.45; margin-top:10px;' +
@@ -15570,7 +15783,15 @@ async function openSaveDialog() {
   cancelBlocklyGesture(); document.getElementById('save-modal').classList.add('show');
   document.getElementById('save-block-wahl').style.display =
     isTextMode ? 'none' : '';
-  if (isTextMode) document.querySelector('input[name="save-art"][value=".py"]').checked = true;
+  document.getElementById('save-art-pbcp').innerHTML =
+    '<strong>' + t('Block-Projekt (.pbcp)') + '</strong>: ' +
+    t('startet im Startmenü des PicoBoy und lässt sich in PBC+ Studio wieder als Blöcke öffnen.');
+  document.getElementById('save-art-py').innerHTML =
+    '<strong>' + t('Python-Programm (.py)') + '</strong>: ' +
+    t('nur der Python-Code, zum Beispiel zum Weiterschreiben im Text-Modus. Lässt sich nicht wieder als Blöcke öffnen.');
+  // Blocks: the block project is the default, it can do everything.
+  document.querySelector('input[name="save-art"][value="' +
+                         (isTextMode ? '.py' : '.pbcp') + '"]').checked = true;
   // Suggest a default name. If we're in text mode and the user just
   // loaded something from the device, that filename is the obvious
   // default.
@@ -15601,11 +15822,11 @@ document.querySelectorAll('input[name="save-art"]').forEach(r => r.addEventListe
 async function refreshSaveDeviceList() {
   const list = document.getElementById('save-device-list');
   list.innerHTML = '<div style="color:var(--fg-2);text-align:center;' +
-                   'padding:24px;">Lade…</div>';
+                   'padding:24px;">' + t('Lade…') + '</div>';
   const alle = runTarget === 'emulator' ? await listEmuFilesRaw() : await listDeviceFilesRaw();
   if (!alle) {
     list.innerHTML = '<div style="color:var(--bad);padding:16px;">' +
-      'Auflisten fehlgeschlagen.</div>';
+      t('Auflisten fehlgeschlagen.') + '</div>';
     return;
   }
   const endung = saveEndung();
@@ -15613,7 +15834,7 @@ async function refreshSaveDeviceList() {
 
   if (files.length === 0) {
     list.innerHTML = '<div style="color:var(--fg-2);padding:16px;">' +
-      'Noch keine <code>' + endung + '</code>-Dateien auf dem Gerät.</div>';
+      t('Noch keine %1-Dateien auf dem Gerät.').replace('%1', '<code>' + endung + '</code>') + '</div>';
     return;
   }
 
@@ -15656,6 +15877,20 @@ document.getElementById('save-name').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') saveToDevice();
 });
 
+// The start menu runs block projects (.pbcp) since the firmware of
+// November 2026; pbc._pbcp_code marks it. With an older firmware on
+// the connected PBC+, tell the student (terminal) and return the
+// text, else null. The emulator has no start menu: nothing to say.
+async function pbcpFirmwareHinweis() {
+  if (runTarget === 'emulator' || !serialPort) return null;
+  const r = await runOnDevice(
+    "import pbc\nprint('PBCP', hasattr(pbc, '_pbcp_code'))\n", 5000);
+  if (!r || r.stderr || !/PBCP False/.test(r.stdout || '')) return null;
+  const hinweis = t('Auf deinem PBC+ ist noch eine ältere Firmware. Block-Projekte erscheinen dort erst nach einem Update im Startmenü: Dateien → MicroPython installieren…');
+  term.write('\r\n\x1b[33m-- ' + hinweis + ' --\x1b[0m\r\n');
+  return hinweis;
+}
+
 async function saveToDevice() {
   if (!(await ensureTargetReady())) return;
   let name = document.getElementById('save-name').value.trim();
@@ -15671,7 +15906,7 @@ async function saveToDevice() {
     if (s.textContent === name) overwrite = true;
   });
   if (overwrite &&
-      !confirm(`"${name}" gibt es schon auf dem PBC+. Überschreiben?`)) {
+      !confirm(t('„%1“ gibt es schon auf dem PBC+. Überschreiben?').replace('%1', name))) {
     return;
   }
 
@@ -15682,7 +15917,9 @@ async function saveToDevice() {
     // for one Python literal on the device.
     if (await uploadBlob(new Blob([projektText()]), name)) {
       setzeDateiname(name);
-      term.write('\r\n\x1b[33m-- ' + t('Dein Block-Projekt ist auf dem PicoBoy gespeichert und kommt so mit dir. Starten lässt es sich dort nicht. Öffne es an einem beliebigen Rechner in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien.') + ' --\x1b[0m\r\n');
+      toast(name + ' ' + t('auf PBC+ gespeichert'), 'good');
+      term.write('\r\n\x1b[33m-- ' + t('Dein Block-Projekt ist auf dem PicoBoy gespeichert. Du startest es im Startmenü (Eintrag mit Blocksymbol) und öffnest es in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien wieder als Blöcke.') + ' --\x1b[0m\r\n');
+      await pbcpFirmwareHinweis();
     }
     return;
   }
@@ -16162,7 +16399,7 @@ function openPaintEditor() {
   SIZE_PRESETS.forEach(p => {
     const b = document.createElement('button');
     b.innerHTML = '<strong>' + p.w + ' × ' + p.h + '</strong>' +
-                  '<span class="preset-label">' + p.label + '</span>';
+                  '<span class="preset-label">' + t(p.label) + '</span>';
     b.addEventListener('click', () => {
       paint.w = p.w; paint.h = p.h;
       document.getElementById('paint-size-w').value = p.w;
@@ -16807,7 +17044,7 @@ function setEmuStatus(text) {
   // The status line still surfaces the states that actually inform the
   // user: loading progress and errors.
   const hidden = (text === 'bereit' || text === 'getrennt' || text === 'lädt…');
-  el.textContent = hidden ? '' : text;
+  el.textContent = hidden ? '' : t(text);
 }
 
 // --- display rendering -------------------------------------------
@@ -17422,7 +17659,7 @@ async function emuWorkerRun(code) {
   } catch (e) {
     wkBeenden();
     emu.running = false;
-    setEmuStatus('Fehler: ' + e.message);
+    setEmuStatus(t('Fehler:') + ' ' + e.message);
     term.write('\r\n\x1b[31m' + t('Der Emulator konnte nicht geladen werden') + ': ' + e.message + '\x1b[0m\r\n');
     return;
   }
@@ -17726,14 +17963,14 @@ const _emuImagesBtn = document.getElementById('emu-images-btn');
 async function showEmuImages() {
   const list = document.getElementById('emu-images-list');
   if (!list) return;
-  list.innerHTML = '<div style="padding:8px;color:var(--fg-2);">lädt…</div>';
+  list.innerHTML = '<div style="padding:8px;color:var(--fg-2);">' + t('Lade…') + '</div>';
   document.getElementById('emu-images-modal').classList.add('show');
   const images = await imgList();
   if (images.length === 0) {
     list.innerHTML =
       '<div style="padding:12px;color:var(--fg-2);">' +
-      'Noch keine Bilder. Lade welche über „Bilder verwalten" hoch oder ' +
-      'zeichne welche mit „Bild zeichnen…".</div>';
+      t('Noch keine Bilder. Lade welche über „Bilder verwalten…“ hoch oder ' +
+        'zeichne welche mit „Bild zeichnen…“.') + '</div>';
     return;
   }
   list.innerHTML = '';
@@ -17755,7 +17992,7 @@ async function showEmuImages() {
                      color:var(--bad);font-weight:bold;">×</button>
     `;
     row.querySelector('[data-del]').addEventListener('click', async () => {
-      if (!confirm(name + ' aus dem Browser löschen?')) return;
+      if (!confirm(t('„%1“ aus dem Browser löschen?').replace('%1', name))) return;
       await imgDelete(name);
       showEmuImages();   // refresh
     });
@@ -18294,7 +18531,7 @@ async function refreshImages() {
     list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">' + msg + '</div>';
     return;
   }
-  list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">Lade…</div>';
+  list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">' + t('Lade…') + '</div>';
   // Emulator path: list from IndexedDB. The serial-Python path below
   // would just return an empty result because uploadBlob() writes to
   // IndexedDB (not to MicroPython's filesystem) when running in the
@@ -18317,7 +18554,7 @@ for n in sorted(os.listdir('/')):
 `;
     const r = await runOnDevice(code, 5000);
     if (!r || r.stderr) {
-      list.innerHTML = '<div style="color:var(--bad);">Auflisten fehlgeschlagen. ' + (r?.stderr||'') + '</div>';
+      list.innerHTML = '<div style="color:var(--bad);">' + t('Auflisten fehlgeschlagen.') + ' ' + (r?.stderr||'') + '</div>';
       return;
     }
     files = r.stdout.split(/\r?\n/)
@@ -18336,7 +18573,7 @@ for n in sorted(os.listdir('/')):
   refreshImageBlocks();
 
   if (!files.length) {
-    list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">Keine PNG-Dateien auf dem Gerät.</div>';
+    list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">' + t('Keine PNG-Dateien auf dem Gerät.') + '</div>';
     return;
   }
   list.innerHTML = '';
@@ -18363,14 +18600,14 @@ for n in sorted(os.listdir('/')):
       await downloadFile(f.name);
     });
     row.querySelector('[data-del]').addEventListener('click', async () => {
-      if (!confirm(f.name + ' wirklich löschen?')) return;
+      if (!confirm(t('„%1“ wirklich löschen?').replace('%1', f.name))) return;
       if (deviceMode === 'emulator' && window.__emuImgDelete) {
         await window.__emuImgDelete(f.name);
-        toast(f.name + ' gelöscht', 'good');
+        toast(f.name + ' ' + t('gelöscht'), 'good');
       } else {
         const r = await runOnDevice(
           `import os\nos.remove(${pyStringLit(f.name)})\nprint('geloescht')\n`);
-        if (r && !r.stderr) toast(f.name + ' gelöscht', 'good');
+        if (r && !r.stderr) toast(f.name + ' ' + t('gelöscht'), 'good');
       }
       refreshImages();
     });
@@ -18455,6 +18692,18 @@ window.addEventListener('load', () => {
         if (txt && I18N_EN[txt]) el.textContent = I18N_EN[txt];
       }
     });
+    // Text pieces inside mixed markup ("… (Block <em>Bild anzeigen</em>
+    // unter …"): the pass above skips elements with children, so look
+    // up every remaining text node by itself, whitespace normalised.
+    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const knoten = [];
+    while (tw.nextNode()) knoten.push(tw.currentNode);
+    for (const n of knoten) {
+      if (n.parentElement && n.parentElement.closest('script, style')) continue;
+      const roh = n.textContent;
+      const en = I18N_EN[roh.replace(/\s+/g, ' ').trim()];
+      if (en) n.textContent = roh.match(/^\s*/)[0] + en + roh.match(/\s*$/)[0];
+    }
     // Placeholders and titles attributes.
     document.querySelectorAll('[placeholder]').forEach(el => {
       const v = el.getAttribute('placeholder');

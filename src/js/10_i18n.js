@@ -160,6 +160,7 @@ const I18N_EN = {
   'Zahl': 'Number',
   'Rechnen + − × ÷ %': 'Math + − × ÷ %',
   'Zufallszahl': 'Random number',
+  'Zufallszahl zwischen … und …': 'Random number between … and …',
   'wahr / falsch': 'true / false',
   'warten (ms)': 'wait (ms)',
   'Zeit seit Programmstart (ms)': 'Time since start (ms)',
@@ -377,11 +378,17 @@ const I18N_EN = {
     'You see every file on the device here. Upload new files or delete existing ones.',
   'Datei(en) hochladen…':           'Upload file(s)…',
   'Datei(en) oder ZIP hochladen…':  'Upload file(s) or ZIP…',
-  'Block-Projekte (.pbcp) laufen nicht direkt auf dem PicoBoy. Öffne sie in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien und speichere sie dann mit „Auf den PBC+…“. So wird daraus ein Python-Programm (.py), das du auf dem Gerät starten kannst.':
-    'Block projects (.pbcp) do not run directly on the PicoBoy. Open them in PBC+ Studio with “From the PBC+…” in the Files menu, then save them with “To the PBC+…”. This turns them into a Python program (.py) you can start on the device.',
+  'Auf deinem PBC+ ist noch eine ältere Firmware. Block-Projekte erscheinen dort erst nach einem Update im Startmenü: Dateien → MicroPython installieren…':
+    'Your PBC+ still has an older firmware. Block projects appear in its launcher only after an update: Files → Install MicroPython…',
+  'Block-Projekt (.pbcp)':          'Block project (.pbcp)',
+  'Python-Programm (.py)':          'Python program (.py)',
+  'startet im Startmenü des PicoBoy und lässt sich in PBC+ Studio wieder als Blöcke öffnen.':
+    'starts from the launcher on the PicoBoy and opens as blocks again in PBC+ Studio.',
+  'nur der Python-Code, zum Beispiel zum Weiterschreiben im Text-Modus. Lässt sich nicht wieder als Blöcke öffnen.':
+    'only the Python code, for example to keep writing in text mode. Does not open as blocks again.',
   'Keine Programme auf dem Gerät.': 'No programs on the device.',
-  'Dein Block-Projekt ist auf dem PicoBoy gespeichert und kommt so mit dir. Starten lässt es sich dort nicht. Öffne es an einem beliebigen Rechner in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien.':
-    'Your block project is saved on the PicoBoy and travels with you. It cannot run there. Open it on any computer in PBC+ Studio with “From the PBC+…” in the Files menu.',
+  'Dein Block-Projekt ist auf dem PicoBoy gespeichert. Du startest es im Startmenü (Eintrag mit Blocksymbol) und öffnest es in PBC+ Studio mit „Vom PBC+…“ im Menü Dateien wieder als Blöcke.':
+    'Your block project is saved on the PicoBoy. Start it from the launcher (entry with the block icon) and open it as blocks again in PBC+ Studio with “From PBC+…” in the Files menu.',
   'Systemdatei':                    'system file',
   'Name doppelt':                   'duplicate name',
   'Ausgelassen:':                   'Skipped:',
@@ -838,6 +845,211 @@ const I18N_EN = {
   'fertig':                       'done',
   'Verbindung zum Gerät verloren':'Connection to device lost',
   'keine OK-Quittung':            'no OK acknowledgement',
+  // Added with build 137 (English pass over dialogs and messages).
+  "Definiert eine Funktion mit Rückgabewert. Ihr Aufruf lässt sich direkt in eine Wert-Lücke ziehen. Mit + fügst du Parameter hinzu.":
+    "Defines a function with a return value. Its call fits straight into a value slot. Use + to add parameters.",
+  "Definiert eine eigene Funktion. Mit + fügst du Parameter hinzu; rufe sie unten überall auf.":
+    "Defines your own function. Use + to add parameters; call it anywhere below.",
+  "Liest einen Parameter oder eine lokale Variable der Funktion.":
+    "Reads a parameter or a local variable of the function.",
+  "Erstellt eine lokale Variable, die nur in dieser Funktion gilt (kein \"global\" nötig).":
+    "Creates a local variable that only exists inside this function (no \"global\" needed).",
+  "Keine Funktionen.":
+    "No functions.",
+  "Überschreiben":
+    "Overwrite",
+  "Bitte zuerst den PBC+ per USB verbinden (Schalter auf PBC+).":
+    "Please connect the PBC+ via USB first (switch set to PBC+).",
+  "PBC+ → Emulator übertragen":
+    "Copy PBC+ → emulator",
+  "Emulator → PBC+ übertragen":
+    "Copy emulator → PBC+",
+  "Dateien auswählen, die vom Gerät in den Emulator kopiert werden.":
+    "Choose the files to copy from the device into the emulator.",
+  "Dateien auswählen, die aus dem Emulator auf das Gerät kopiert werden.":
+    "Choose the files to copy from the emulator onto the device.",
+  "Übertragen":
+    "Copy",
+  "Keine Dateien gefunden.":
+    "No files found.",
+  "überschreibt":
+    "overwrites",
+  "Überschreiben bestätigen":
+    "Confirm overwrite",
+  "Diese Dateien existieren am Ziel bereits und werden überschrieben:":
+    "These files already exist at the destination and will be overwritten:",
+  "Fortfahren?":
+    "Proceed?",
+  "Fertig":
+    "Done",
+  "Datei(en) übertragen":
+    "file(s) copied",
+  "übertragen":
+    "copied",
+  "fehlgeschlagen":
+    "failed",
+  "Zeichen-Position außerhalb":
+    "Character position out of range",
+  "Du hast ein Zeichen an einer Stelle angesprochen, die es im Text nicht gibt. Positionen gehen von 0 bis Länge-1.":
+    "You asked for a character at a position the text does not have. Positions go from 0 to length-1.",
+  "Ungültiger Wert":
+    "Invalid value",
+  "Das gesuchte Element ist nicht in der Liste. Prüfe vorher mit \"in\", ob es darin vorkommt.":
+    "The element you are looking for is not in the list. Check first with \"in\" whether it is there.",
+  "Die Liste ist leer – davon gibt es kein Minimum oder Maximum.":
+    "The list is empty – it has no minimum or maximum.",
+  "Ein Wert passt nicht zu dieser Funktion. Schau in die rote Fehlermeldung im Terminal, um zu sehen welcher.":
+    "A value does not fit this function. Look at the red error message in the terminal to see which one.",
+  "Datei nicht gefunden":
+    "File not found",
+  "Das Programm wollte eine Datei öffnen, die es nicht gibt. Prüfe den Dateinamen – oder schreibe die Datei zuerst. Ein Bild muss vorher mit „Dateien → Bilder verwalten…“ hochgeladen sein.":
+    "The program tried to open a file that does not exist. Check the file name – or write the file first. An image has to be uploaded with “Files → Manage images…” first.",
+  "Der Emulator konnte nicht geladen werden":
+    "The emulator could not be loaded",
+  "Zuerst mit dem Gerät verbinden.":
+    "Connect to the device first.",
+  "(keine Funktion)":
+    "(no function)",
+  "Sprite löschen":
+    "Delete sprite",
+  "Sprite „%1“ löschen?":
+    "Delete sprite “%1”?",
+  "— Noch keine Bilder hochgeladen —":
+    "— No images uploaded yet —",
+  "Lade ein Bild über das Menü <em>Dateien ▾ → Bilder verwalten…</em> hoch und versuche es erneut.":
+    "Upload an image via <em>Files ▾ → Manage images…</em> and try again.",
+  "konnte nicht erstellt werden:":
+    "could not be created:",
+  "Programme laufen unverändert in einem eigenen Thread, mit so viel Speicher wie auf dem PicoBoy.":
+    "Programs run unchanged in their own thread, with as much memory as on the PicoBoy.",
+  "Nicht verfügbar: Der Webserver sendet die nötigen Header nicht (siehe .htaccess).":
+    "Not available: the web server does not send the required headers (see .htaccess).",
+  "Schreibgeschützt. Aktiviere die Bearbeitung, um Python direkt zu ändern.":
+    "Read-only. Enable editing to change the Python code directly.",
+  "Wenn du jetzt zu den Blöcken zurückwechselst, gehen alle Änderungen am Python-Code verloren. Die Blöcke überschreiben den Editor-Inhalt.\n\nWirklich zurückwechseln?":
+    "If you switch back to blocks now, all changes to the Python code are lost. The blocks overwrite the editor content.\n\nReally switch back?",
+  "Wenn du die Python-Bearbeitung aktivierst, geht der Weg NUR IN EINE RICHTUNG:\n\n  Blöcke  →  Python (jetzt)\n  Python  →  Blöcke ist NICHT möglich.\n\nDu kannst zwar zurück zu den Blöcken wechseln, aber dann gehen deine Python-Änderungen verloren.\n\nFortfahren?":
+    "Enabling Python editing is a ONE-WAY street:\n\n  Blocks  →  Python (now)\n  Python  →  Blocks is NOT possible.\n\nYou can switch back to blocks, but then your Python changes are lost.\n\nProceed?",
+  "Python-Bearbeitung aktiv. Zurück zu Blöcken bedeutet Datenverlust.":
+    "Python editing active. Going back to blocks loses your changes.",
+  "„%1“ wird benutzt, aber nicht importiert. Schreibe oben: import %1":
+    "“%1” is used but not imported. Add at the top: import %1",
+  "%1 gibt es nicht.":
+    "%1 does not exist.",
+  "Meintest du %1?":
+    "Did you mean %1?",
+  "Datei „%1“ wirklich vom PBC+ löschen?":
+    "Really delete file “%1” from the PBC+?",
+  "Das kann nicht rückgängig gemacht werden.":
+    "This cannot be undone.",
+  "Noch keine %1-Dateien auf dem Gerät.":
+    "No %1 files on the device yet.",
+  "„%1“ gibt es schon auf dem PBC+. Überschreiben?":
+    "“%1” already exists on the PBC+. Overwrite?",
+  "Mini-Sprite":
+    "mini sprite",
+  "kleines Sprite":
+    "small sprite",
+  "mittleres Sprite":
+    "medium sprite",
+  "großes Sprite":
+    "large sprite",
+  "ganzes Display":
+    "whole display",
+  "nicht verfügbar":
+    "not available",
+  "lade MicroPython…":
+    "loading MicroPython…",
+  "läuft":
+    "running",
+  "Fehler:":
+    "Error:",
+  "Noch keine Bilder. Lade welche über „Bilder verwalten…“ hoch oder zeichne welche mit „Bild zeichnen…“.":
+    "No images yet. Upload some via “Manage images…” or draw some with “Draw image…”.",
+  "„%1“ aus dem Browser löschen?":
+    "Delete “%1” from the browser?",
+  "Keine PNG-Dateien auf dem Gerät.":
+    "No PNG files on the device.",
+  "„%1“ wirklich löschen?":
+    "Really delete “%1”?",
+  "Öffnen":
+    "Open",
+  "Bild zeichnen…":
+    "Draw image…",
+  "Hier klicken und Hardware wünschen.":
+    "Click here to request hardware.",
+  "Dateien auf dem Gerät (nur":
+    "Files on the device (only",
+  "Hinweis: Vom PBC+ geladene Dateien landen im Text-Modus.":
+    "Note: files loaded from the PBC+ open in text mode.",
+  "Wähle einen Namen und ein Bild. Das Bild muss schon auf den PBC+ hochgeladen sein (oder per „Bilder verwalten…\").":
+    "Choose a name and an image. The image must already be uploaded to the PBC+ (or via “Manage images…”).",
+  "Bild:":
+    "Image:",
+  "Vorhandene Dateien (Klick = übernehmen + überschreiben):":
+    "Existing files (click = use name + overwrite):",
+  "Bilder auf dem PBC+":
+    "Images on the PBC+",
+  "Hochgeladene PNG-Dateien kannst du direkt auf dem Display anzeigen lassen (Block":
+    "You can show uploaded PNG files directly on the display (block",
+  "unter „Display\") oder als Sprite verwenden (Blöcke unter „Sprites\"). Zum Hoch- oder Anzeigen muss das Gerät verbunden sein.":
+    "under “Display”) or use them as sprites (blocks under “Sprites”). The device must be connected to upload or show them.",
+  "Farbe wählen":
+    "Choose colour",
+  "Bild bearbeiten und hochladen":
+    "Edit and upload image",
+  "Noch kein Bild geladen.":
+    "No image loaded yet.",
+  "Bild von der Festplatte wählen…":
+    "Choose image from disk…",
+  "Ausgabegröße":
+    "Output size",
+  "Maximal 240 × 280 (Display-Größe)":
+    "At most 240 × 280 (display size)",
+  "Seitenverhältnis beibehalten":
+    "Keep aspect ratio",
+  "Vorschau auf dem Display":
+    "Preview on the display",
+  "Tipp: Ziehe das blaue Rechteck zum Verschieben, die Ecken zum Verändern der Größe. Das Bild wird beim Hochladen auf die Ausgabegröße skaliert.":
+    "Tip: drag the blue rectangle to move it, its corners to resize. The image is scaled to the output size when uploading.",
+  "Anderes Bild…":
+    "Other image…",
+  "Neues Bild zeichnen":
+    "Draw new image",
+  "Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel gross; ein ganzes Display ist 240×280.":
+    "Choose the size of the image. Sprites are typically 16–48 pixels; a whole display is 240×280.",
+  "Höhe:":
+    "Height:",
+  "Bild zeichnen":
+    "Draw image",
+  "Rückgängig":
+    "Undo",
+  "Stärke":
+    "Width",
+  "Farbe":
+    "Colour",
+  "Wie möchtest du dein Programm ausführen?":
+    "How do you want to run your program?",
+  "PBC+ über USB":
+    "PBC+ via USB",
+  "Echtes Gerät, am Computer angeschlossen":
+    "Real device, connected to the computer",
+  "Virtueller PBC+ im Browser, kein Gerät nötig":
+    "Virtual PBC+ in the browser, no device needed",
+  "Der Emulator führt MicroPython im Browser aus. Manche Funktionen sind eingeschränkt:":
+    "The emulator runs MicroPython in the browser. Some functions are limited:",
+  "Bilder im Browser":
+    "Images in the browser",
+  "Diese Bilder sind im Browser gespeichert (nicht auf einem Gerät) und stehen dem Emulator zur Verfügung.":
+    "These images are stored in the browser (not on a device) and are available to the emulator.",
+  "Ziel wählen: echtes Gerät oder Emulator":
+    "Choose target: real device or emulator",
+  "Codeansicht ein-/ausblenden":
+    "Show/hide code view",
+  "Ziehen, um das Terminal größer oder kleiner zu machen":
+    "Drag to make the terminal bigger or smaller",
+  "Ziehen = Gerät kippen, Doppelklick = flach hinlegen":
+    "Drag = tilt device, double-click = lay flat",
 };
 
 function t(s) {

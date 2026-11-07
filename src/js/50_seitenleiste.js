@@ -1977,13 +1977,13 @@ function renderSpriteButtons(body) {
           ` · ${sp.image}</span></span>`;
       const del = document.createElement('span');
       del.textContent = '×';
-      del.title = 'Sprite löschen';
+      del.title = t('Sprite löschen');
       del.style.cssText =
         'color:var(--danger);font-size:18px;line-height:1;' +
         'padding:0 6px;cursor:pointer;';
       del.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!confirm(`Sprite "${sp.name}" löschen?`)) return;
+        if (!confirm(t('Sprite „%1“ löschen?').replace('%1', sp.name))) return;
         PBC_SPRITES.splice(idx, 1);
         refreshSpritesCategory();
         updateCodeView();
@@ -2242,12 +2242,12 @@ function openNewSpriteDialog() {
   sel.innerHTML = '';
   if (KNOWN_IMAGES.length === 0) {
     const opt = document.createElement('option');
-    opt.textContent = '— Noch keine Bilder hochgeladen —';
+    opt.textContent = t('— Noch keine Bilder hochgeladen —');
     opt.value = '';
     sel.appendChild(opt);
     hint.innerHTML =
-      'Lade ein Bild über das Menü <em>Dateien ▾ → Bilder ' +
-      'verwalten…</em> hoch und versuche es erneut.';
+      t('Lade ein Bild über das Menü <em>Dateien ▾ → Bilder ' +
+        'verwalten…</em> hoch und versuche es erneut.');
   } else {
     KNOWN_IMAGES.forEach(name => {
       const opt = document.createElement('option');

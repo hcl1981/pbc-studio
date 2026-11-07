@@ -75,6 +75,18 @@ window.addEventListener('load', () => {
         if (txt && I18N_EN[txt]) el.textContent = I18N_EN[txt];
       }
     });
+    // Text pieces inside mixed markup ("… (Block <em>Bild anzeigen</em>
+    // unter …"): the pass above skips elements with children, so look
+    // up every remaining text node by itself, whitespace normalised.
+    const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const knoten = [];
+    while (tw.nextNode()) knoten.push(tw.currentNode);
+    for (const n of knoten) {
+      if (n.parentElement && n.parentElement.closest('script, style')) continue;
+      const roh = n.textContent;
+      const en = I18N_EN[roh.replace(/\s+/g, ' ').trim()];
+      if (en) n.textContent = roh.match(/^\s*/)[0] + en + roh.match(/\s*$/)[0];
+    }
     // Placeholders and titles attributes.
     document.querySelectorAll('[placeholder]').forEach(el => {
       const v = el.getAttribute('placeholder');

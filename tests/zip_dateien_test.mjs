@@ -63,8 +63,10 @@ try {
   pruefe(stand.aus['start.py'] === 'print("hallo")', 'bei doppeltem Namen bleibt die erste Datei');
   pruefe(stand.liste.includes('apfel.png'), 'Bild steht in der Bilderliste');
   pruefe(stand.xml === vorher, 'Arbeitsfläche unverändert, nichts geöffnet');
-  const hinweis = page.getByText('Block-Projekte (.pbcp) laufen nicht direkt');
-  pruefe(await hinweis.locator('visible=true').count() === 2, 'Hinweis zu .pbcp in Dialog und Terminal');
+  // .pbcp starts from the device menu; a hint only comes with old
+  // firmware on a real PBC+, never in the emulator.
+  const hinweis = page.getByText('Block-Projekte erscheinen dort erst nach einem Update');
+  pruefe(await hinweis.locator('visible=true').count() === 0, 'kein Firmware-Hinweis im Emulator');
   await page.getByRole('button', { name: 'Schließen' }).click();
 
   // open the block project from the target, then save it as Python
@@ -83,7 +85,9 @@ try {
   await page.evaluate(() => document.getElementById('btn-upload').click());
   await page.waitForSelector('#save-modal.show');
   await page.waitForTimeout(300);
-  pruefe(await page.inputValue('#save-name') === 'schatz.py', 'Name beim Speichern: schatz.py');
+  pruefe(await page.inputValue('#save-name') === 'schatz.pbcp', 'Block-Projekt vorausgewählt: schatz.pbcp');
+  await page.check('input[name="save-art"][value=".py"]');
+  pruefe(await page.inputValue('#save-name') === 'schatz.py', 'Name wechselt zu schatz.py');
   await page.click('#save-confirm');
   await page.waitForFunction(async () => !!(await window.__emuImgGet('schatz.py')), null, { timeout: 5000 }).catch(() => {});
   const py = await page.evaluate(async () => { const b = await window.__emuImgGet('schatz.py'); return b ? b.text() : ''; });

@@ -17,6 +17,8 @@ lauf node oberflaeche_test.mjs
 lauf node dropdown_test.mjs
 lauf node zip_test.mjs
 lauf node zip_dateien_test.mjs
+lauf node pbcp_start_test.mjs
+lauf node englisch_test.mjs
 node hilfe_beispiele.mjs >/dev/null && PBC_AUSGABE=ergebnisse/hilfe_aus node pruefe_py.mjs ergebnisse/hilfe/*.py > ergebnisse/hilfe.log 2>&1
 lauf node hilfe_auswerten.mjs < ergebnisse/hilfe.log
 if [ "${1:-}" = voll ]; then

@@ -101,12 +101,14 @@ document.getElementById('btn-new').addEventListener('click', () => {
   updateCodeView();
 });
 
-// The current block program as the text of a .pbcp file.
+// The current block program as the text of a .pbcp file. "py" is the
+// complete program with its import lines: the start menu on the
+// PicoBoy runs it straight from the file.
 function projektText() {
   return JSON.stringify({
     kind: 'pbc-blocks',
     json: Blockly.serialization.workspaces.save(workspace),
-    py: generatedCode(),
+    py: fullProgram(),
     stringVars: Array.from(STRING_VAR_NAMES),
     canvasVars: Array.from(CANVAS_VAR_NAMES),
     sprites: PBC_SPRITES,
@@ -228,7 +230,7 @@ for n in sorted(os.listdir('/')):
       // deleting so a misclick can't wipe an hour of work.
       const del = document.createElement('button');
       del.textContent = '×';
-      del.title = 'Datei löschen';
+      del.title = t('Datei löschen');
       del.style.cssText =
         'background:transparent;color:var(--danger);' +
         'border:1px solid transparent;border-radius:4px;' +
@@ -254,8 +256,8 @@ for n in sorted(os.listdir('/')):
 
 async function deleteFromDevice(name) {
   if (!serialPort) { toast(t('Nicht verbunden'), 'bad'); return; }
-  if (!confirm(`Datei "${name}" wirklich vom PBC+ löschen?\n\n` +
-               'Das kann nicht rückgängig gemacht werden.')) {
+  if (!confirm(t('Datei „%1“ wirklich vom PBC+ löschen?').replace('%1', name) + '\n\n' +
+               t('Das kann nicht rückgängig gemacht werden.'))) {
     return;
   }
   const code = `
@@ -269,7 +271,7 @@ except Exception as e:
   const r = await runOnDevice(code, 4000);
   if (!r) return;
   if (r.stdout.trim().startsWith('OK')) {
-    toast(name + ' gelöscht', 'good');
+    toast(name + ' ' + t('gelöscht'), 'good');
     // Refresh the list in place by re-running the device-list query.
     document.getElementById('open-device-btn').click();
   } else {

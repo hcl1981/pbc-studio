@@ -532,7 +532,7 @@ function methodNameOptions() {
   if (current && !seen.has(current)) {
     opts.unshift([current + ' (?)', current]);
   }
-  if (opts.length === 0) return [['(keine Funktion)', '']];
+  if (opts.length === 0) return [[t('(keine Funktion)'), '']];
   return opts;
 }
 

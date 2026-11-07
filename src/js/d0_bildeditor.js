@@ -487,7 +487,7 @@ async function refreshImages() {
     list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">' + msg + '</div>';
     return;
   }
-  list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">Lade…</div>';
+  list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">' + t('Lade…') + '</div>';
   // Emulator path: list from IndexedDB. The serial-Python path below
   // would just return an empty result because uploadBlob() writes to
   // IndexedDB (not to MicroPython's filesystem) when running in the
@@ -510,7 +510,7 @@ for n in sorted(os.listdir('/')):
 `;
     const r = await runOnDevice(code, 5000);
     if (!r || r.stderr) {
-      list.innerHTML = '<div style="color:var(--bad);">Auflisten fehlgeschlagen. ' + (r?.stderr||'') + '</div>';
+      list.innerHTML = '<div style="color:var(--bad);">' + t('Auflisten fehlgeschlagen.') + ' ' + (r?.stderr||'') + '</div>';
       return;
     }
     files = r.stdout.split(/\r?\n/)
@@ -529,7 +529,7 @@ for n in sorted(os.listdir('/')):
   refreshImageBlocks();
 
   if (!files.length) {
-    list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">Keine PNG-Dateien auf dem Gerät.</div>';
+    list.innerHTML = '<div style="color:var(--fg-2);text-align:center;padding:24px;">' + t('Keine PNG-Dateien auf dem Gerät.') + '</div>';
     return;
   }
   list.innerHTML = '';
@@ -556,14 +556,14 @@ for n in sorted(os.listdir('/')):
       await downloadFile(f.name);
     });
     row.querySelector('[data-del]').addEventListener('click', async () => {
-      if (!confirm(f.name + ' wirklich löschen?')) return;
+      if (!confirm(t('„%1“ wirklich löschen?').replace('%1', f.name))) return;
       if (deviceMode === 'emulator' && window.__emuImgDelete) {
         await window.__emuImgDelete(f.name);
-        toast(f.name + ' gelöscht', 'good');
+        toast(f.name + ' ' + t('gelöscht'), 'good');
       } else {
         const r = await runOnDevice(
           `import os\nos.remove(${pyStringLit(f.name)})\nprint('geloescht')\n`);
-        if (r && !r.stderr) toast(f.name + ' gelöscht', 'good');
+        if (r && !r.stderr) toast(f.name + ' ' + t('gelöscht'), 'good');
       }
       refreshImages();
     });

@@ -621,8 +621,8 @@ document.getElementById('btn-settings').addEventListener('click', () => {
     const info = document.getElementById('settings-emu-info');
     const isoliert = typeof SharedArrayBuffer !== 'undefined' && self.crossOriginIsolated === true;
     if (info) info.textContent = isoliert
-      ? 'Programme laufen unverändert in einem eigenen Thread, mit so viel Speicher wie auf dem PicoBoy.'
-      : 'Nicht verfügbar: Der Webserver sendet die nötigen Header nicht (siehe .htaccess).';
+      ? t('Programme laufen unverändert in einem eigenen Thread, mit so viel Speicher wie auf dem PicoBoy.')
+      : t('Nicht verfügbar: Der Webserver sendet die nötigen Header nicht (siehe .htaccess).');
   }
   cancelBlocklyGesture(); document.getElementById('settings-modal').classList.add('show');
 });
@@ -905,7 +905,7 @@ function setMode(text, opts) {
       banner.style.display = '';
       banner.classList.remove('unlocked');
       document.getElementById('text-banner-msg').textContent =
-        'Schreibgeschützt. Aktiviere die Bearbeitung, um Python direkt zu ändern.';
+        t('Schreibgeschützt. Aktiviere die Bearbeitung, um Python direkt zu ändern.');
       document.getElementById('btn-edit-on').hidden = false;
     }
     document.getElementById('codeview').textContent =
@@ -922,11 +922,11 @@ function setMode(text, opts) {
     // switched back, no need to interrupt them.
     if (isTextMode && codeEditor) {
       const cur = codeEditor.getValue();
-      if (cur !== textBaseline && !confirm(
+      if (cur !== textBaseline && !confirm(t(
           'Wenn du jetzt zu den Blöcken zurückwechselst, gehen alle ' +
           'Änderungen am Python-Code verloren. Die Blöcke ' +
           'überschreiben den Editor-Inhalt.\n\n' +
-          'Wirklich zurückwechseln?')) {
+          'Wirklich zurückwechseln?'))) {
         return;
       }
     }
@@ -952,13 +952,13 @@ function setMode(text, opts) {
 // edits.
 function setupEditLockButton() {
   document.getElementById('btn-edit-on').addEventListener('click', () => {
-    if (!confirm(
+    if (!confirm(t(
         'Wenn du die Python-Bearbeitung aktivierst, geht der Weg ' +
         'NUR IN EINE RICHTUNG:\n\n' +
         '  Blöcke  →  Python (jetzt)\n' +
         '  Python  →  Blöcke ist NICHT möglich.\n\n' +
         'Du kannst zwar zurück zu den Blöcken wechseln, aber dann ' +
-        'gehen deine Python-Änderungen verloren.\n\nFortfahren?')) {
+        'gehen deine Python-Änderungen verloren.\n\nFortfahren?'))) {
       return;
     }
     if (codeEditor) {
@@ -968,7 +968,7 @@ function setupEditLockButton() {
     const banner = document.getElementById('text-banner');
     banner.classList.add('unlocked');
     document.getElementById('text-banner-msg').textContent =
-      'Python-Bearbeitung aktiv. Zurück zu Blöcken bedeutet Datenverlust.';
+      t('Python-Bearbeitung aktiv. Zurück zu Blöcken bedeutet Datenverlust.');
     document.getElementById('btn-edit-on').hidden = true;
   });
 }

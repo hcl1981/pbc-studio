@@ -138,13 +138,13 @@ function pyVorpruefung(src) {
       if (definiert.has(modul)) continue;          // a variable called e.g. "time"
       if (!importiert.has(modul) && !gemeldet.has('imp:' + modul)) {
         gemeldet.add('imp:' + modul);
-        warnungen.push({ zeile: i + 1, text: `"${modul}" wird benutzt, aber nicht importiert. Schreibe oben: import ${modul}` });
+        warnungen.push({ zeile: i + 1, text: t('„%1“ wird benutzt, aber nicht importiert. Schreibe oben: import %1').replace(/%1/g, modul) });
       }
       const bekannt = PY_MODUL_NAMEN[modul];
       if (bekannt && bekannt.indexOf(name) < 0 && !gemeldet.has(modul + '.' + name)) {
         gemeldet.add(modul + '.' + name);
         const v = pyVorschlag(name, bekannt);
-        warnungen.push({ zeile: i + 1, text: `${modul}.${name} gibt es nicht.` + (v ? ` Meintest du ${modul}.${v}?` : '') });
+        warnungen.push({ zeile: i + 1, text: t('%1 gibt es nicht.').replace('%1', modul + '.' + name) + (v ? ' ' + t('Meintest du %1?').replace('%1', modul + '.' + v) : '') });
       }
     }
   });

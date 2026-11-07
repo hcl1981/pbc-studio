@@ -482,7 +482,7 @@ function spawnBlock(type, fields, dropAt) {
     }
     return block;
   } catch (e) {
-    toast(type + ' konnte nicht erstellt werden: ' + e.message, 'bad');
+    toast(type + ' ' + t('konnte nicht erstellt werden:') + ' ' + e.message, 'bad');
     console.error(e);
     return null;
   }

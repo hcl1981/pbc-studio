@@ -448,7 +448,7 @@ function openPaintEditor() {
   SIZE_PRESETS.forEach(p => {
     const b = document.createElement('button');
     b.innerHTML = '<strong>' + p.w + ' × ' + p.h + '</strong>' +
-                  '<span class="preset-label">' + p.label + '</span>';
+                  '<span class="preset-label">' + t(p.label) + '</span>';
     b.addEventListener('click', () => {
       paint.w = p.w; paint.h = p.h;
       document.getElementById('paint-size-w').value = p.w;

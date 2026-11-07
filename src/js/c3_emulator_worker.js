@@ -273,7 +273,7 @@ async function emuWorkerRun(code) {
   } catch (e) {
     wkBeenden();
     emu.running = false;
-    setEmuStatus('Fehler: ' + e.message);
+    setEmuStatus(t('Fehler:') + ' ' + e.message);
     term.write('\r\n\x1b[31m' + t('Der Emulator konnte nicht geladen werden') + ': ' + e.message + '\x1b[0m\r\n');
     return;
   }

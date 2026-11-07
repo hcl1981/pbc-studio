@@ -198,14 +198,14 @@ const _emuImagesBtn = document.getElementById('emu-images-btn');
 async function showEmuImages() {
   const list = document.getElementById('emu-images-list');
   if (!list) return;
-  list.innerHTML = '<div style="padding:8px;color:var(--fg-2);">lädt…</div>';
+  list.innerHTML = '<div style="padding:8px;color:var(--fg-2);">' + t('Lade…') + '</div>';
   document.getElementById('emu-images-modal').classList.add('show');
   const images = await imgList();
   if (images.length === 0) {
     list.innerHTML =
       '<div style="padding:12px;color:var(--fg-2);">' +
-      'Noch keine Bilder. Lade welche über „Bilder verwalten" hoch oder ' +
-      'zeichne welche mit „Bild zeichnen…".</div>';
+      t('Noch keine Bilder. Lade welche über „Bilder verwalten…“ hoch oder ' +
+        'zeichne welche mit „Bild zeichnen…“.') + '</div>';
     return;
   }
   list.innerHTML = '';
@@ -227,7 +227,7 @@ async function showEmuImages() {
                      color:var(--bad);font-weight:bold;">×</button>
     `;
     row.querySelector('[data-del]').addEventListener('click', async () => {
-      if (!confirm(name + ' aus dem Browser löschen?')) return;
+      if (!confirm(t('„%1“ aus dem Browser löschen?').replace('%1', name))) return;
       await imgDelete(name);
       showEmuImages();   // refresh
     });

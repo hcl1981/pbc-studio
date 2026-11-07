@@ -5,7 +5,7 @@
 // by one with every build (no manual version bookkeeping needed). Shown
 // only in the terminal banner. APP_BUILD doubles as the internal build
 // marker, so there's a single source of truth.
-const APP_BUILD = 136;
+const APP_BUILD = 137;
 const APP_DATE  = '2026-10-29';   // build.py sets the day of the build
 
 /* =====================================================================

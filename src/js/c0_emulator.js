@@ -125,7 +125,7 @@ function setEmuStatus(text) {
   // The status line still surfaces the states that actually inform the
   // user: loading progress and errors.
   const hidden = (text === 'bereit' || text === 'getrennt' || text === 'lädt…');
-  el.textContent = hidden ? '' : text;
+  el.textContent = hidden ? '' : t(text);
 }
 
 // --- display rendering -------------------------------------------
