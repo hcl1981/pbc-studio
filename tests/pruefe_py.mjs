@@ -35,7 +35,7 @@ const freierPort = () => new Promise((ok) => {
 });
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
-const MATERIAL = path.resolve(process.env.PBC_MATERIAL || path.join(HIER, '../../dokumentation_python/material'));
+const MATERIAL = path.resolve(process.env.PBC_MATERIAL || path.join(HIER, '../../buecher/dokumentation_python/material'));
 // PBC_AUSGABE=<dir>: write console output and pictures there instead of
 // next to the programs (test runs must not touch the book's files).
 const AUSGABE = process.env.PBC_AUSGABE ? path.resolve(process.env.PBC_AUSGABE) : null;

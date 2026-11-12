@@ -13,7 +13,7 @@ const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
 const CHROME = process.env.PBC_CHROME ||
   path.join(os.homedir(), '.cache/ms-playwright/chromium-1228/chrome-linux64/chrome');
-const PROJEKT = fs.readFileSync(path.resolve(HIER, '../../dokumentation/buch/programme/' + 'k06_rechentrainer.pbcp'), 'utf8');
+const PROJEKT = fs.readFileSync(path.resolve(HIER, '../../buecher/dokumentation/buch/programme/' + 'k06_rechentrainer.pbcp'), 'utf8');
 let fehler = 0;
 const pruefe = (ok, text) => { console.log((ok ? 'ok     ' : 'FEHLER ') + text); if (!ok) fehler++; };
 

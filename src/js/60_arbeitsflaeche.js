@@ -15,6 +15,10 @@ function setupWorkspace() {
     move: { scrollbars: true, drag: true, wheel: false },
     theme: makeDarkTheme(),
     renderer: 'zelos',
+    // Icons and sounds from jsdelivr (cdnjs lacks the .wav files): the default host (blockly-demo.appspot.com)
+    // sends no CORP header, so with COEP require-corp (needed for Safari,
+    // see src/htaccess) they would be blocked.
+    media: 'https://cdn.jsdelivr.net/npm/blockly@12.3.1/media/',
   });
   workspace.addChangeListener(updateCodeView);
 

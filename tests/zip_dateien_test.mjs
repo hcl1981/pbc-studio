@@ -14,8 +14,8 @@ const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
 const CHROME = process.env.PBC_CHROME ||
   path.join(os.homedir(), '.cache/ms-playwright/chromium-1228/chrome-linux64/chrome');
-const MATERIAL = path.resolve(HIER, '../../showcase_bloecke/material');
-const PROJEKT = path.resolve(HIER, '../../dokumentation/schule/programme/ab22c_a2.pbcp');
+const MATERIAL = path.resolve(HIER, '../../buecher/showcase_bloecke/material');
+const PROJEKT = path.resolve(HIER, '../../buecher/dokumentation/schule/programme/ab22c_a2.pbcp');
 let fehler = 0;
 const pruefe = (ok, text) => { console.log((ok ? 'ok     ' : 'FEHLER ') + text); if (!ok) fehler++; };
 

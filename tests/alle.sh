@@ -13,6 +13,7 @@ lauf env PBC_AUSGABE=ergebnisse/faelle node pruefe_py.mjs faelle/*.py
 lauf node editor_test.mjs
 lauf node stop_test.mjs
 lauf node ohne_isolation.mjs
+lauf node isolation_test.mjs
 lauf node oberflaeche_test.mjs
 lauf node dropdown_test.mjs
 lauf node zip_test.mjs
@@ -22,9 +23,9 @@ lauf node englisch_test.mjs
 node hilfe_beispiele.mjs >/dev/null && PBC_AUSGABE=ergebnisse/hilfe_aus node pruefe_py.mjs ergebnisse/hilfe/*.py > ergebnisse/hilfe.log 2>&1
 lauf node hilfe_auswerten.mjs < ergebnisse/hilfe.log
 if [ "${1:-}" = voll ]; then
-  lauf env PBC_AUSGABE=ergebnisse/w_buch node pruefe_py.mjs ../../dokumentation_python/buch/programme/*.py
-  lauf env PBC_AUSGABE=ergebnisse/w_schule node pruefe_py.mjs ../../dokumentation_python/schule/programme/*.py
-  lauf node pruefe_bloecke.mjs ../../dokumentation/buch/programme/*.pbcp ../../dokumentation/schule/programme/*.pbcp
+  lauf env PBC_AUSGABE=ergebnisse/w_buch node pruefe_py.mjs ../../buecher/dokumentation_python/buch/programme/*.py
+  lauf env PBC_AUSGABE=ergebnisse/w_schule node pruefe_py.mjs ../../buecher/dokumentation_python/schule/programme/*.py
+  lauf node pruefe_bloecke.mjs ../../buecher/dokumentation/buch/programme/*.pbcp ../../buecher/dokumentation/schule/programme/*.pbcp
 fi
 echo; [ $FEHLER = 0 ] && echo "ALLE TESTS OK" || echo "ES GIBT FEHLER"
 exit $FEHLER

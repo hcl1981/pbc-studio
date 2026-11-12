@@ -3,12 +3,14 @@
 # PBC+ Studio runs programs in a Web Worker (real sleep/input, Stop
 # works for every program). Without them, PBC+ Studio still works and
 # uses its older emulator.
-# "credentialless" (not "require-corp"): external files without
-# CORP/CORS headers -- Blockly's icons and sounds -- still load,
-# just without cookies.
+# "require-corp", not "credentialless": Safari (and so every browser on
+# iPad and iPhone) does not know "credentialless" and would not isolate
+# the page. All external files come from cdnjs/jsdelivr, which send
+# "Cross-Origin-Resource-Policy: cross-origin"; Blockly's icons and
+# sounds come from jsdelivr (option "media" in 60_arbeitsflaeche.js).
 <IfModule mod_headers.c>
   Header always set Cross-Origin-Opener-Policy "same-origin"
-  Header always set Cross-Origin-Embedder-Policy "credentialless"
+  Header always set Cross-Origin-Embedder-Policy "require-corp"
 </IfModule>
 
 # The page embeds MicroPython; compressed it is about half the size.

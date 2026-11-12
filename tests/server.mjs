@@ -18,7 +18,7 @@ export function starteServer(wurzel, { isolation = true } = {}) {
       const kopf = { 'Content-Type': TYPEN[path.extname(datei)] || 'application/octet-stream' };
       if (isolation) {
         kopf['Cross-Origin-Opener-Policy'] = 'same-origin';
-        kopf['Cross-Origin-Embedder-Policy'] = 'credentialless';
+        kopf['Cross-Origin-Embedder-Policy'] = 'require-corp';
       }
       res.writeHead(200, kopf);
       fs.createReadStream(datei).pipe(res);

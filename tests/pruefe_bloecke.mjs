@@ -16,7 +16,7 @@ const freierPort = () => new Promise((ok) => {
 });
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
-const MATERIAL = path.resolve(process.env.PBC_MATERIAL || path.join(HIER, '../../dokumentation/material'));
+const MATERIAL = path.resolve(process.env.PBC_MATERIAL || path.join(HIER, '../../buecher/dokumentation/material'));
 const CHROME = process.env.PBC_CHROME ||
   path.join(os.homedir(), '.cache/ms-playwright/chromium-1228/chrome-linux64/chrome');
 const zeigeCode = process.argv.includes('--code');

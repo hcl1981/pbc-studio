@@ -1687,12 +1687,15 @@ hero.forward(100)</code></pre>`,
       ] },
       { title: 'Batterie', entries: [
         { id: 'sensors-batt', label: 'pbc.battery_voltage()', content: { kind: 'topic',
-          body: { de: `<p>Aktuelle Batterie-Spannung in Volt. Bei voller Batterie etwa 4.0–4.2 V,
-          bei leerer unter 3.3 V. Am USB-Kabel (und im Emulator) etwa 5 V;
-          <code>pbc.is_on_usb()</code> sagt, ob das Gerät am USB hängt.</p>`,
-                  en: `<p>Current battery voltage in volts. About 4.0–4.2 V on full
-          charge, under 3.3 V when empty.</p>` },
-          example: { de: 'v = pbc.battery_voltage()\npbc.text12("Akku: " + str(v) + "V", 30, 30, pbc.WHITE)',
+          body: { de: `<p>Aktuelle Spannung der beiden Batterien in Volt: frisch etwa 3.0–3.2 V,
+          fast leer etwa 2.0–2.2 V, mit NiMH-Akkus etwa 2.4–2.7 V. Am USB-Kabel (und im
+          Emulator) etwa 5 V; <code>pbc.is_on_usb()</code> sagt, ob das Gerät am USB hängt.
+          Aufladen kann der PicoBoy Akkus nicht.</p>`,
+                  en: `<p>Current voltage of the two batteries in volts: about 3.0–3.2 V when
+          fresh, 2.0–2.2 V when almost empty, 2.4–2.7 V with NiMH rechargeables. About 5 V
+          on the USB cable (and in the emulator); <code>pbc.is_on_usb()</code> tells whether
+          the device is on USB. The PicoBoy cannot charge rechargeable batteries.</p>` },
+          example: { de: 'v = pbc.battery_voltage()\npbc.text12("Batterie: " + str(v) + "V", 30, 30, pbc.WHITE)',
                      en: 'v = pbc.battery_voltage()\npbc.text12("Battery: " + str(v) + "V", 30, 30, pbc.WHITE)' } } },
       ] },
     ],
