@@ -229,7 +229,7 @@ function emuHighlight(name, on) {
   // DOM elements are transparent overlays now (vs the old SVG fills),
   // so we tweak background-color instead of the 'fill' attribute.
   const map = {
-    a: 'emu-hit-a', b: 'emu-hit-b',
+    a: 'emu-hl-a', b: 'emu-hl-b',
     left:'emu-hit-left', right:'emu-hit-right',
     up:'emu-hit-up', down:'emu-hit-down', center:'emu-hit-center',
   };
@@ -237,7 +237,7 @@ function emuHighlight(name, on) {
   if (!id) return;
   const el = document.getElementById(id);
   // orange: white would vanish on the white joystick and button bodies
-  if (el) el.style.background = on ? 'rgba(255,150,0,0.45)' : 'transparent';
+  if (el) el.style.background = on ? 'rgba(255,150,0,0.6)' : 'transparent';
 }
 let emuInputBound = false;
 // Tilt pad: the dot's offset from the centre (radius = 1 g) gives the
@@ -279,7 +279,7 @@ function bindEmuNeigung() {
 function bindEmuJoystick() {
   const feld = document.getElementById('emu-joy');
   if (!feld) return;
-  const MX = (150 - 40) / (262 - 40), MY = (887 - 800) / (975 - 800);  // cap centre in the zone
+  const MX = (149.5 - 40) / (262 - 40), MY = (889.5 - 800) / (975 - 800);  // cap centre in the zone
   let aktiv = null;
   const setze = (name) => {
     if (name === aktiv) return;

@@ -1679,40 +1679,46 @@
                 width:2.6%;height:1.6%;border-radius:50%;
                 background:transparent;
                 box-shadow:none;"></div>
-    <!-- Click targets for the joystick directions. The joystick cap
-         spans roughly x:115..185 y:855..930 in the crop, so each
-         arm sits just outside the cap. -->
+    <!-- Highlights (only light up, see emuHighlight). Measured on
+         pbcp.png (609x1035): joystick cap centre (149.5, 889.5), cap
+         diameter 80; the four arrows sit 60 px from the centre, all
+         inside the white module (x 69..230, y 805..974). Button caps:
+         A (367, 896), B (487, 896), diameter 59. -->
     <div id="emu-hit-up"     class="emu-hit"
-         style="position:absolute;left:18%;top:78%;width:13%;height:5%;
-                cursor:pointer;"></div>
+         style="position:absolute;pointer-events:none;left:22.25%;top:78.79%;width:4.6%;height:2.71%;
+                clip-path:polygon(50% 0,100% 100%,0 100%);"></div>
     <div id="emu-hit-down"   class="emu-hit"
-         style="position:absolute;left:18%;top:90.5%;width:13%;height:5%;
-                cursor:pointer;"></div>
+         style="position:absolute;pointer-events:none;left:22.25%;top:90.39%;width:4.6%;height:2.71%;
+                clip-path:polygon(0 0,100% 0,50% 100%);"></div>
     <div id="emu-hit-left"   class="emu-hit"
-         style="position:absolute;left:12%;top:83%;width:6%;height:10%;
-                cursor:pointer;"></div>
+         style="position:absolute;pointer-events:none;left:12.4%;top:84.59%;width:4.6%;height:2.71%;
+                clip-path:polygon(0 50%,100% 0,100% 100%);"></div>
     <div id="emu-hit-right"  class="emu-hit"
-         style="position:absolute;left:31%;top:83%;width:6%;height:10%;
-                cursor:pointer;"></div>
+         style="position:absolute;pointer-events:none;left:32.1%;top:84.59%;width:4.6%;height:2.71%;
+                clip-path:polygon(0 0,100% 50%,0 100%);"></div>
     <div id="emu-hit-center" class="emu-hit"
-         style="position:absolute;left:21%;top:84%;width:7%;height:6%;
-                border-radius:50%;cursor:pointer;"></div>
-    <!-- One touch zone over the whole joystick module (x 40..262,
-         y 800..975 of 609x1035). Tap or slide: the direction from the
-         cap centre (150, 887) picks up/down/left/right, the cap itself
-         is MITTE (bindEmuJoystick). The five emu-hit-* above only
-         light up. -->
+         style="position:absolute;pointer-events:none;left:17.98%;top:82.08%;width:13.14%;height:7.73%;
+                border-radius:50%;"></div>
+    <div id="emu-hl-a"
+         style="position:absolute;pointer-events:none;left:55.42%;top:83.72%;width:9.69%;height:5.7%;
+                border-radius:50%;"></div>
+    <div id="emu-hl-b"
+         style="position:absolute;pointer-events:none;left:75.12%;top:83.72%;width:9.69%;height:5.7%;
+                border-radius:50%;"></div>
+    <!-- Touch zones. Joystick: one zone over the whole module (x 40..262,
+         y 800..975); the direction from the cap centre picks
+         up/down/left/right, the cap itself is MITTE (bindEmuJoystick).
+         A (left) and B (right): the white button body with its pins,
+         A x 319..415, B x 439..535, y 818..974. -->
     <div id="emu-joy"
-         style="position:absolute;left:6.5%;top:77.3%;width:36.5%;height:16.9%;
+         style="position:absolute;left:6.57%;top:77.29%;width:36.45%;height:16.91%;
                 cursor:pointer;touch-action:none;"></div>
-    <!-- A (left) and B (right): the whole white button body,
-         A x 320..415, B x 440..535, y 818..952 of 609x1035. -->
-    <div id="emu-hit-a" class="emu-hit"
-         style="position:absolute;left:52.5%;top:79%;width:15.6%;height:13%;
-                border-radius:12%;cursor:pointer;touch-action:none;"></div>
-    <div id="emu-hit-b" class="emu-hit"
-         style="position:absolute;left:72.3%;top:79%;width:15.6%;height:13%;
-                border-radius:12%;cursor:pointer;touch-action:none;"></div>
+    <div id="emu-hit-a"
+         style="position:absolute;left:52.38%;top:79.03%;width:15.76%;height:15.07%;
+                cursor:pointer;touch-action:none;"></div>
+    <div id="emu-hit-b"
+         style="position:absolute;left:72.09%;top:79.03%;width:15.76%;height:15.07%;
+                cursor:pointer;touch-action:none;"></div>
   </div>
   <div style="padding:6px 10px;font-size:11px;color:var(--fg-2);
               text-align:center;border-top:1px solid var(--border);
@@ -1779,7 +1785,7 @@
 // by one with every build (no manual version bookkeeping needed). Shown
 // only in the terminal banner. APP_BUILD doubles as the internal build
 // marker, so there's a single source of truth.
-const APP_BUILD = 140;
+const APP_BUILD = 141;
 const APP_DATE  = '2026-11-12';   // build.py sets the day of the build
 
 /* =====================================================================
@@ -17164,7 +17170,7 @@ function emuHighlight(name, on) {
   // DOM elements are transparent overlays now (vs the old SVG fills),
   // so we tweak background-color instead of the 'fill' attribute.
   const map = {
-    a: 'emu-hit-a', b: 'emu-hit-b',
+    a: 'emu-hl-a', b: 'emu-hl-b',
     left:'emu-hit-left', right:'emu-hit-right',
     up:'emu-hit-up', down:'emu-hit-down', center:'emu-hit-center',
   };
@@ -17172,7 +17178,7 @@ function emuHighlight(name, on) {
   if (!id) return;
   const el = document.getElementById(id);
   // orange: white would vanish on the white joystick and button bodies
-  if (el) el.style.background = on ? 'rgba(255,150,0,0.45)' : 'transparent';
+  if (el) el.style.background = on ? 'rgba(255,150,0,0.6)' : 'transparent';
 }
 let emuInputBound = false;
 // Tilt pad: the dot's offset from the centre (radius = 1 g) gives the
@@ -17214,7 +17220,7 @@ function bindEmuNeigung() {
 function bindEmuJoystick() {
   const feld = document.getElementById('emu-joy');
   if (!feld) return;
-  const MX = (150 - 40) / (262 - 40), MY = (887 - 800) / (975 - 800);  // cap centre in the zone
+  const MX = (149.5 - 40) / (262 - 40), MY = (889.5 - 800) / (975 - 800);  // cap centre in the zone
   let aktiv = null;
   const setze = (name) => {
     if (name === aktiv) return;
