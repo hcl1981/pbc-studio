@@ -14,6 +14,7 @@ lauf node editor_test.mjs
 lauf node stop_test.mjs
 lauf node ohne_isolation.mjs
 lauf node isolation_test.mjs
+lauf node joystick_test.mjs
 lauf node oberflaeche_test.mjs
 lauf node dropdown_test.mjs
 lauf node zip_test.mjs

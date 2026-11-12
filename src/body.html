@@ -772,7 +772,8 @@
   </div>
   <!-- Device area. position:relative so absolute overlays anchor here. -->
   <div id="emu-device"
-       style="position:relative;width:100%;aspect-ratio:609/1035;">
+       style="position:relative;width:100%;aspect-ratio:609/1035;
+              -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;">
     <!-- Background image: the real product rendering. -->
     <img src="pbcp.png" alt=""
          draggable="false"
@@ -853,21 +854,27 @@
     <div id="emu-hit-center" class="emu-hit"
          style="position:absolute;left:21%;top:84%;width:7%;height:6%;
                 border-radius:50%;cursor:pointer;"></div>
-    <!-- A and B button click targets. Buttons in the crop: A at
-         (~368, 905) -> (60.4%, 87.4%); B at (~517, 905) ->
-         (84.9%, 87.4%). Make targets generous (~10%) so a fat
-         finger / mouse hits reliably. -->
+    <!-- One touch zone over the whole joystick module (x 40..262,
+         y 800..975 of 609x1035). Tap or slide: the direction from the
+         cap centre (150, 887) picks up/down/left/right, the cap itself
+         is MITTE (bindEmuJoystick). The five emu-hit-* above only
+         light up. -->
+    <div id="emu-joy"
+         style="position:absolute;left:6.5%;top:77.3%;width:36.5%;height:16.9%;
+                cursor:pointer;touch-action:none;"></div>
+    <!-- A (left) and B (right): the whole white button body,
+         A x 320..415, B x 440..535, y 818..952 of 609x1035. -->
     <div id="emu-hit-a" class="emu-hit"
-         style="position:absolute;left:55%;top:84%;width:11%;height:8%;
-                border-radius:50%;cursor:pointer;"></div>
+         style="position:absolute;left:52.5%;top:79%;width:15.6%;height:13%;
+                border-radius:12%;cursor:pointer;touch-action:none;"></div>
     <div id="emu-hit-b" class="emu-hit"
-         style="position:absolute;left:79%;top:84%;width:11%;height:8%;
-                border-radius:50%;cursor:pointer;"></div>
+         style="position:absolute;left:72.3%;top:79%;width:15.6%;height:13%;
+                border-radius:12%;cursor:pointer;touch-action:none;"></div>
   </div>
   <div style="padding:6px 10px;font-size:11px;color:var(--fg-2);
               text-align:center;border-top:1px solid var(--border);
               background:var(--bg-2);border-radius:0 0 9px 9px;">
-    Steuerung: Pfeile · A · B · Leertaste
+    Steuerung: Joystick und Tasten antippen oder Pfeile · A · B · Leertaste
   </div>
   <!-- Tilt pad for the tilt sensor: drag the dot = tilt the device
        (dot to the right = right edge lower), double click = flat.

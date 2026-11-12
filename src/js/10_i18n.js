@@ -1048,6 +1048,8 @@ const I18N_EN = {
     "Show/hide code view",
   "Ziehen, um das Terminal größer oder kleiner zu machen":
     "Drag to make the terminal bigger or smaller",
+  "Steuerung: Joystick und Tasten antippen oder Pfeile · A · B · Leertaste":
+    "Controls: tap the joystick and buttons, or arrows · A · B · space",
   "Ziehen = Gerät kippen, Doppelklick = flach hinlegen":
     "Drag = tilt device, double-click = lay flat",
 };

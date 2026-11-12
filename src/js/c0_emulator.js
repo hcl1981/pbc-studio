@@ -236,7 +236,8 @@ function emuHighlight(name, on) {
   const id = map[name];
   if (!id) return;
   const el = document.getElementById(id);
-  if (el) el.style.background = on ? 'rgba(255,255,255,0.2)' : 'transparent';
+  // orange: white would vanish on the white joystick and button bodies
+  if (el) el.style.background = on ? 'rgba(255,150,0,0.45)' : 'transparent';
 }
 let emuInputBound = false;
 // Tilt pad: the dot's offset from the centre (radius = 1 g) gives the
@@ -272,6 +273,39 @@ function bindEmuNeigung() {
   setze(0, 0);
 }
 
+// Joystick by touch or mouse: one zone over the module. The direction
+// from the cap centre decides; on the cap itself it is MITTE. Sliding
+// the finger changes the direction like tilting the real stick.
+function bindEmuJoystick() {
+  const feld = document.getElementById('emu-joy');
+  if (!feld) return;
+  const MX = (150 - 40) / (262 - 40), MY = (887 - 800) / (975 - 800);  // cap centre in the zone
+  let aktiv = null;
+  const setze = (name) => {
+    if (name === aktiv) return;
+    if (aktiv) emuButtonUp(aktiv);
+    aktiv = name;
+    if (name) emuButtonDown(name);
+  };
+  const richtung = (e) => {
+    const r = feld.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width * MX);
+    const dy = e.clientY - (r.top + r.height * MY);
+    const tot = r.width * 0.17;                    // about the cap radius
+    if (Math.hypot(dx, dy) < tot) return 'center';
+    return Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
+  };
+  feld.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    feld.setPointerCapture(e.pointerId);
+    setze(richtung(e));
+  });
+  feld.addEventListener('pointermove', (e) => { if (aktiv) setze(richtung(e)); });
+  const los = () => setze(null);
+  feld.addEventListener('pointerup', los);
+  feld.addEventListener('pointercancel', los);
+}
+
 function bindEmuInput() {
   bindEmuNeigung();
   if (emuInputBound) return;
@@ -289,11 +323,7 @@ function bindEmuInput() {
     el.addEventListener('pointercancel', up);
     el.addEventListener('pointerleave', up);
   };
-  wire('emu-hit-left',   'left');
-  wire('emu-hit-right',  'right');
-  wire('emu-hit-up',     'up');
-  wire('emu-hit-down',   'down');
-  wire('emu-hit-center', 'center');
+  bindEmuJoystick();
   wire('emu-hit-a',      'a');
   wire('emu-hit-b',      'b');
   // Keyboard mapping while the modal is open.
