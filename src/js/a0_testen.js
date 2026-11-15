@@ -1705,9 +1705,6 @@ function showDatenschutzDialog() {
   body.className = 'modal-body';
   body.style.cssText = 'font-size:13.5px; line-height:1.6; max-height:65vh; overflow:auto;';
   body.innerHTML = (LANG === 'en') ? `
-    <p><b>Controller</b><br>
-       Jan Schulz, Mondorfer Str. 28, 53844 Troisdorf, Germany<br>
-       E-mail: <a class="imp-email" style="color:var(--accent);"></a></p>
     <p><b>In short</b><br>
        PBC+ Studio needs no account, sets no cookies and uses no tracking
        or advertising. Your programs and images stay in your browser or on
@@ -1744,10 +1741,10 @@ function showDatenschutzDialog() {
        of processing, data portability and objection (Art. 15–21 GDPR), and
        you may lodge a complaint with a data protection supervisory
        authority.</p>
+    <p><b>Controller</b><br>
+       Jan Schulz (address: see the <a data-action="to-impressum" style="color:var(--accent);cursor:pointer;text-decoration:underline;">legal notice</a>)<br>
+       E-mail: <a class="imp-email" style="color:var(--accent);"></a></p>
   ` : `
-    <p><b>Verantwortlicher</b><br>
-       Jan Schulz, Mondorfer Str. 28, 53844 Troisdorf<br>
-       E-Mail: <a class="imp-email" style="color:var(--accent);"></a></p>
     <p><b>Kurz gesagt</b><br>
        PBC+ Studio braucht kein Konto, setzt keine Cookies und nutzt weder
        Tracking noch Werbung. Deine Programme und Bilder bleiben in deinem
@@ -1787,7 +1784,12 @@ function showDatenschutzDialog() {
        Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch
        (Art. 15–21 DSGVO) und kannst dich bei einer
        Datenschutz-Aufsichtsbehörde beschweren.</p>
+    <p><b>Verantwortlicher</b><br>
+       Jan Schulz (Anschrift: siehe <a data-action="to-impressum" style="color:var(--accent);cursor:pointer;text-decoration:underline;">Impressum</a>)<br>
+       E-Mail: <a class="imp-email" style="color:var(--accent);"></a></p>
   `;
+  body.querySelector('[data-action="to-impressum"]')
+    ?.addEventListener('click', () => { close(); showImpressumDialog(); });
   const _addr = 'info' + '@' + 'picoboy.de';
   const _emailEl = body.querySelector('.imp-email');
   if (_emailEl) {
