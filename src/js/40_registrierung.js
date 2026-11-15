@@ -487,7 +487,7 @@ function methodParamOptions() {
   const current = (field && typeof field.getValue === 'function')
     ? field.getValue() : '';
   push(current);
-  if (names.length === 0) return [['(kein Parameter)', '']];
+  if (names.length === 0) return [[t('(kein Parameter)'), '']];
   return names.map(n => [n, n]);
 }
 
@@ -816,7 +816,7 @@ Blockly.defineBlocksWithJsonArray([{
         ['−',   'SUB'],
         ['×',   'MUL'],
         ['÷',   'DIV'],
-        ['Rest','MOD'],
+        [t('Rest'),'MOD'],
       ] },
     { type: 'input_value', name: 'B', check: 'Number' },
   ],

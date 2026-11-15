@@ -556,6 +556,8 @@
   .text-banner #text-banner-msg {
     flex: 1; color: var(--fg-1); font-size: 13px;
   }
+  /* left of the message: on the right the docked emulator panel covers it */
+  .text-banner #btn-edit-on { order: -1; }
   .text-banner.unlocked #text-banner-msg {
     color: var(--fg-0); font-weight: 500;
   }

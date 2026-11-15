@@ -3,8 +3,11 @@
 Programmierumgebung im Browser für den PicoBoy Color Plus: Blöcke und Python,
 mit Emulator und Übertragung per USB. Online unter <https://pbcstudio.de>.
 
-Die Tests unter `tests/` erwarten daneben die Ordner `showcase_bloecke/` und
-`dokumentation/`, die nicht zu diesem Repository gehören.
+Die Tests unter `tests/` erwarten neben diesem Ordner den Ordner `buecher/`
+(`../buecher/showcase_bloecke/`, `../buecher/dokumentation/` und
+`../buecher/dokumentation_python/`), der nicht zu diesem Repository gehört.
+Sie laden Blockly, CodeMirror und xterm wie die Seite selbst vom CDN, brauchen
+also eine Internetverbindung.
 
 `src/kontakt.php` ist der Mail-Endpunkt des Kontaktformulars. Vor dem Hochladen
 oben in der Datei die Adressen `$TO` und `$FROM` eintragen; sie liegt neben
@@ -49,6 +52,7 @@ Die `.htaccess` lässt sie komprimiert ausliefern.
 | 11 ZIP mit Bildern | **Dateien → Bilder verwalten… → ZIP hochladen…** lädt alle PNGs einer ZIP-Datei ohne Bildeditor hoch, in den Emulator oder aufs Gerät (Ordner in der ZIP werden ignoriert, andere Dateien übersprungen). Am Ende steht „n von m Bilder … hochgeladen“ im Terminal (Build 123). |
 | 12 Meldungen vor Dialogen | Kurze Meldungen (unten eingeblendet) liegen jetzt **vor** offenen Dialogen; vorher blitzten sie hinter z. B. „Bilder verwalten“ nur kurz durch (Build 124). |
 | 13 Stopp ohne Fehlermeldung | ■ Stopp während **▶ Testen** auf dem PicoBoy zeigt keinen roten KeyboardInterrupt-Traceback und keinen Fehlerhinweis mehr; der Ton wird danach unsichtbar abgeschaltet statt Code ins Terminal zu tippen (Build 125). |
+| 14 Englisch vollständig, Datenschutz | Restliche deutsche Texte der englischen Oberfläche übersetzt (Dialoge, Auswahllisten der Blöcke, Terminal); `tests/englisch_test.mjs` vergleicht jetzt die deutsche mit der englischen Seite und findet alles, was gleich geblieben ist. Neuer Dialog **Datenschutz** in der Fußzeile. „Bearbeitung aktivieren“ steht links in der Leiste, wo das Emulatorfenster es nicht verdeckt (Build 142). |
 
 Der Emulator bringt sein eigenes MicroPython 1.29.0 mit (Variante „pbc“,
 eingebettet in die Datei, siehe `micropython/README.md`); vom CDN wird nichts

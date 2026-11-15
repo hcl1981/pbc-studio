@@ -329,7 +329,7 @@ async function emuWorkerRun(code) {
 async function wkErgebnisMelden(ergebnis) {
   let msg = ergebnis.fehler;
   if (!msg) {
-    term.write('\r\n\x1b[32m-- fertig --\x1b[0m\r\n');
+    term.write('\r\n\x1b[32m-- ' + t('fertig') + ' --\x1b[0m\r\n');
     return;
   }
   if (ergebnis.abgebrochen || /KeyboardInterrupt/.test(msg)) {

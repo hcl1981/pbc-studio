@@ -1,8 +1,8 @@
 # PBC+ Studio: cross-origin isolation for the worker emulator.
 # With these two headers the browser provides SharedArrayBuffer, and
 # PBC+ Studio runs programs in a Web Worker (real sleep/input, Stop
-# works for every program). Without them, PBC+ Studio still works and
-# uses its older emulator.
+# works for every program). Without them the emulator does not run and
+# says so; blocks, editor and the PBC+ via USB still work.
 # "require-corp", not "credentialless": Safari (and so every browser on
 # iPad and iPhone) does not know "credentialless" and would not isolate
 # the page. All external files come from cdnjs/jsdelivr, which send

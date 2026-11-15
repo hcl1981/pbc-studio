@@ -1079,7 +1079,7 @@ function showInstallMicroPythonDialog() {
        border-radius:6px; padding:9px 11px; margin:12px 0;">
       <b>⚠ Warning:</b> Flashing erases <b>everything</b> on the PBC+ –
       all your programs, images and saved files. If you want to keep them,
-      create a backup first via <b>File → Create flash backup (.uf2)…</b>
+      create a backup first via <b>Files → Create flash backup (.uf2)…</b>
       before you continue.
     </p>
 
@@ -1119,7 +1119,7 @@ function showInstallMicroPythonDialog() {
       <b>⚠ Achtung:</b> Beim Flashen wird <b>alles</b> auf dem PBC+
       gelöscht – alle deine Programme, Bilder und gespeicherten Dateien.
       Wenn du sie behalten möchtest, erstelle vorher ein Backup über
-      <b>Datei → Flash-Backup erstellen (.uf2)…</b>, bevor du fortfährst.
+      <b>Dateien → Flash-Backup erstellen (.uf2)…</b>, bevor du fortfährst.
     </p>
 
     <ol style="margin:14px 0 14px 22px; padding:0;">
@@ -1696,6 +1696,117 @@ function showImpressumDialog() {
   setTimeout(() => ok.focus(), 0);
 }
 
+// Privacy notice. States what the page really does: static hosting,
+// libraries from two CDNs, the contact form (kontakt.php), browser
+// storage. Keep it in step with head.html and kontakt.php.
+function showDatenschutzDialog() {
+  const { overlay, dialog, close } = buildModalShell(t('Datenschutz'));
+  const body = document.createElement('div');
+  body.className = 'modal-body';
+  body.style.cssText = 'font-size:13.5px; line-height:1.6; max-height:65vh; overflow:auto;';
+  body.innerHTML = (LANG === 'en') ? `
+    <p><b>Controller</b><br>
+       Jan Schulz, Mondorfer Str. 28, 53844 Troisdorf, Germany<br>
+       E-mail: <a class="imp-email" style="color:var(--accent);"></a></p>
+    <p><b>In short</b><br>
+       PBC+ Studio needs no account, sets no cookies and uses no tracking
+       or advertising. Your programs and images stay in your browser or on
+       your PBC+; they are not sent to a server.</p>
+    <p><b>Opening the page (hosting)</b><br>
+       The page is hosted by STRATO GmbH, Berlin, Germany. When you open it,
+       the web server processes your IP address, the time and the requested
+       file, and keeps them in log files for a short time, to deliver the
+       page and keep it secure (Art. 6(1)(f) GDPR).</p>
+    <p><b>Libraries from content delivery networks</b><br>
+       The editor loads Blockly, CodeMirror and xterm.js from
+       <i>cdnjs</i> (Cloudflare, Inc., USA) and <i>jsDelivr</i> (Volentio
+       JSD Limited, UK, with servers of further providers). Your browser
+       connects to these services, which see your IP address. This is
+       needed for the page to work (Art. 6(1)(f) GDPR). No other data is
+       sent to them.</p>
+    <p><b>Contact form and hardware request</b><br>
+       If you send a message, your text, the name and e-mail address you
+       enter (both optional) and your IP address are sent to me by e-mail,
+       so I can answer and prevent abuse (Art. 6(1)(f) GDPR). To limit
+       spam, the server temporarily keeps the time of your message under
+       a hash of your IP address. I delete
+       messages once they have been dealt with.</p>
+    <p><b>Storage in your browser</b><br>
+       Settings (language, font size, sensors), your current program and
+       the emulator's files and images are stored locally in your browser
+       (localStorage / IndexedDB). They stay on your device; you can remove
+       them by clearing the site data in your browser.</p>
+    <p><b>PBC+ via USB</b><br>
+       The connection to the PBC+ (Web Serial) runs only between your
+       browser and the device.</p>
+    <p><b>Your rights</b><br>
+       You have the right of access, rectification, erasure, restriction
+       of processing, data portability and objection (Art. 15–21 GDPR), and
+       you may lodge a complaint with a data protection supervisory
+       authority.</p>
+  ` : `
+    <p><b>Verantwortlicher</b><br>
+       Jan Schulz, Mondorfer Str. 28, 53844 Troisdorf<br>
+       E-Mail: <a class="imp-email" style="color:var(--accent);"></a></p>
+    <p><b>Kurz gesagt</b><br>
+       PBC+ Studio braucht kein Konto, setzt keine Cookies und nutzt weder
+       Tracking noch Werbung. Deine Programme und Bilder bleiben in deinem
+       Browser oder auf deinem PBC+; sie werden nicht an einen Server
+       geschickt.</p>
+    <p><b>Aufruf der Seite (Hosting)</b><br>
+       Die Seite liegt bei der STRATO GmbH, Berlin. Beim Aufruf verarbeitet
+       der Webserver deine IP-Adresse, den Zeitpunkt und die abgerufene
+       Datei und speichert sie kurzzeitig in Protokolldateien, um die Seite
+       auszuliefern und sicher zu betreiben (Art. 6 Abs. 1 lit. f DSGVO).</p>
+    <p><b>Bibliotheken von Content-Delivery-Netzen</b><br>
+       Der Editor lädt Blockly, CodeMirror und xterm.js von
+       <i>cdnjs</i> (Cloudflare, Inc., USA) und <i>jsDelivr</i> (Volentio
+       JSD Limited, Großbritannien, mit Servern weiterer Anbieter). Dein
+       Browser baut dafür eine Verbindung zu diesen Diensten auf; sie
+       erfahren dabei deine IP-Adresse. Das ist nötig, damit die Seite
+       funktioniert (Art. 6 Abs. 1 lit. f DSGVO). Weitere Daten werden
+       dorthin nicht übertragen.</p>
+    <p><b>Kontaktformular und Hardware-Wunsch</b><br>
+       Wenn du eine Nachricht abschickst, gehen dein Text, der angegebene
+       Name und die E-Mail-Adresse (beides freiwillig) sowie deine
+       IP-Adresse per E-Mail an mich, damit ich antworten und Missbrauch
+       verhindern kann (Art. 6 Abs. 1 lit. f DSGVO). Zum Schutz vor Spam
+       merkt sich der Server den Zeitpunkt deiner Nachricht vorübergehend
+       unter einem Hashwert deiner IP-Adresse. Nachrichten lösche ich, sobald das Anliegen erledigt ist.</p>
+    <p><b>Speicher in deinem Browser</b><br>
+       Einstellungen (Sprache, Schriftgröße, Sensoren), dein aktuelles
+       Programm sowie die Dateien und Bilder des Emulators liegen lokal in
+       deinem Browser (localStorage / IndexedDB). Sie bleiben auf deinem
+       Gerät; du entfernst sie, indem du die Website-Daten im Browser
+       löschst.</p>
+    <p><b>PBC+ per USB</b><br>
+       Die Verbindung zum PBC+ (Web Serial) läuft nur zwischen deinem
+       Browser und dem Gerät.</p>
+    <p><b>Deine Rechte</b><br>
+       Du hast das Recht auf Auskunft, Berichtigung, Löschung,
+       Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch
+       (Art. 15–21 DSGVO) und kannst dich bei einer
+       Datenschutz-Aufsichtsbehörde beschweren.</p>
+  `;
+  const _addr = 'info' + '@' + 'picoboy.de';
+  const _emailEl = body.querySelector('.imp-email');
+  if (_emailEl) {
+    _emailEl.textContent = _addr;
+    _emailEl.setAttribute('href', 'mailto:' + _addr);
+  }
+  dialog.appendChild(body);
+  const foot = document.createElement('div');
+  foot.className = 'modal-foot';
+  const ok = document.createElement('button');
+  ok.className = 'tb-btn primary';
+  ok.textContent = t('Schließen');
+  ok.addEventListener('click', close);
+  foot.appendChild(ok);
+  dialog.appendChild(foot);
+  document.body.appendChild(overlay);
+  setTimeout(() => ok.focus(), 0);
+}
+
 // Shared form renderer. `kind` is 'contact' or 'hardware'. Builds the
 // fields, the honeypot, the open-timer, and the submit handler.
 function showMessageForm(kind) {
@@ -1857,6 +1968,7 @@ if (LANG === 'en') {
 }
 _fcEl?.addEventListener('click', () => showContactDialog());
 _fiEl?.addEventListener('click', () => showImpressumDialog());
+document.getElementById('footer-datenschutz')?.addEventListener('click', () => showDatenschutzDialog());
 
 document.getElementById('btn-test').addEventListener('click', async () => {
   const code = fullProgram();
@@ -2069,15 +2181,14 @@ async function showFriendlyErrorHint(stderr) {
     // Text mode: a module name usually means the import line is missing.
     if (isTextMode && /^(pbc|time|random|math|turtle|os)$/.test(which || '')) {
       await alertDialog(tx('Unbekannter Name'),
-        tx('Das Programm kennt den Namen "') + which + '" ' + tx('nicht.') + ' ' +
+        tx('Das Programm kennt den Namen "%1" nicht.').replace('%1', which) + ' ' +
         (LANG === 'en' ? 'Add the line  import ' + which + '  at the top of your program.'
                        : 'Schreibe ganz oben in dein Programm die Zeile  import ' + which));
       return;
     }
     await alertDialog(tx('Unbekannter Name'),
       (which
-        ? tx('Das Programm kennt den Namen "') + which + '" ' +
-          tx('nicht.')
+        ? tx('Das Programm kennt den Namen "%1" nicht.').replace('%1', which)
         : tx('Das Programm kennt einen Namen nicht.')) + ' ' +
       tx('Häufige Ursachen: Variable noch nicht angelegt, Sprite ' +
         'gelöscht, Funktion umbenannt.'));

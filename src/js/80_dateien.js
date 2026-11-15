@@ -196,7 +196,7 @@ for n in sorted(os.listdir('/')):
 
     if (files.length === 0) {
       list.innerHTML = '<div style="color:var(--fg-2);padding:16px;">' +
-        'Keine <code>.py</code>-Dateien auf dem Gerät.</div>';
+        t('Keine .py-Dateien auf dem Gerät.').replace('.py', '<code>.py</code>') + '</div>';
       return;
     }
 

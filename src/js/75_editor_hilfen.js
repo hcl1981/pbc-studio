@@ -245,6 +245,6 @@ function pyVorpruefungZeigen() {
   pyFehlerzeileLoeschen();
   const w = pyVorpruefung(codeEditor.getValue());
   for (const x of w.slice(0, 8)) {
-    term.write('\x1b[33mHinweis Zeile ' + x.zeile + ': ' + x.text + '\x1b[0m\r\n');
+    term.write('\x1b[33m' + t('Hinweis Zeile %1:').replace('%1', x.zeile) + ' ' + x.text + '\x1b[0m\r\n');
   }
 }

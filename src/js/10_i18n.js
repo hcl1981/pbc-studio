@@ -29,17 +29,14 @@ const I18N_EN = {
   '▶ Testen': '▶ Run',
   '■ Stop': '■ Stop',
   'Verbinden': 'Connect',
-  'Trennen': 'Disconnect',
   'Konsole leeren': 'Clear console',
   'Soft-Reset': 'Soft reset',
   'NICHT VERBUNDEN': 'NOT CONNECTED',
-  'nicht verbunden': 'not connected',
   'Seriell / REPL': 'Serial / REPL',
 
   // -- Dateien dropdown ----------------------------------------------
   'Neu': 'New',
   'Öffnen…': 'Open…',
-  'Speichern': 'Save',
   'Auf den Computer…': 'To this computer…',
   'Impressum': 'Legal notice',
   'Kontakt': 'Contact',
@@ -141,7 +138,7 @@ const I18N_EN = {
   'Joystick unten':  'Joystick down',
   'Joystick links':  'Joystick left',
   'Joystick rechts': 'Joystick right',
-  'Joystick Mitte':  'Joystick centre',
+  'Joystick Mitte':  'Joystick center',
   'wurde gedrückt A': 'A pressed',
   'wurde gedrückt B': 'B pressed',
   'Beschleunigung X': 'Acceleration X',
@@ -182,15 +179,15 @@ const I18N_EN = {
   'Dieser Name wird in dieser Funktion schon verwendet.':
     'This name is already used in this function.',
   'lokale Variable': 'local variable',
-  'wert': 'value',
   'Noch keine Sprites.': 'No sprites yet.',
-  'Befehle': 'Commands',
   'zeige Sprite': 'show sprite',
   'verstecke Sprite': 'hide sprite',
   'Sprite setzen auf x/y': 'set sprite to x/y',
   'Sprite versetzen um dx/dy': 'move sprite by dx/dy',
-  'Sprite nach x/y gleiten': 'glide sprite to x/y',
-  'Sprite um dx/dy gleiten': 'glide sprite by dx/dy',
+  'gleite Sprite nach x/y': 'glide sprite to x/y',
+  'gleite Sprite um dx/dy': 'glide sprite by dx/dy',
+  '(kein Sprite)': '(no sprite)',
+  '(kein Parameter)': '(no parameter)',
   'x von Sprite': 'sprite x',
   'y von Sprite': 'sprite y',
   'Sprite berührt Sprite': 'sprite touches sprite',
@@ -281,7 +278,6 @@ const I18N_EN = {
   'Klicke auf den Bild-Block und wähle eine Datei aus der Liste. Falls die Liste leer ist, lade zuerst über Dateien → Bilder verwalten ein PNG hoch.':
     'Click the image block and pick a file from the list. If the list is empty, first upload a PNG via Files → Manage images.',
   'Sprite-Befehl ohne Sprite':      'Sprite command without sprite',
-  'Sprite-Befehl ohne Sprite':      'Sprite command without sprite',
   'Funktionsaufruf ohne Funktion':  'Function call without function',
   'Diese Funktionen werden aufgerufen, aber nicht (mehr) definiert:':
     'These functions are called but not (any longer) defined:',
@@ -316,14 +312,12 @@ const I18N_EN = {
   'Ein Wert hatte ein unerwartetes Format. Schau in die rote Fehlermeldung im Terminal, um zu sehen welcher.':
     'A value had an unexpected format. Check the red error message in the terminal to see which.',
   'Unbekannter Name':               'Unknown name',
-  'Das Programm kennt den Namen "':
-    'The program does not know the name "',
-  '" nicht.':                       '".',
+  'Das Programm kennt den Namen "%1" nicht.':
+    'The program does not know the name "%1".',
   'Das Programm kennt einen Namen nicht.':
     'The program references a name it does not know.',
   'Häufige Ursachen: Variable noch nicht angelegt, Sprite gelöscht, Funktion umbenannt.':
     'Common causes: variable not yet created, sprite deleted, function renamed.',
-  'nicht.':                         'not defined.',
   'Endlose Selbst-Aufrufe':         'Endless self-calls',
   'Eine Funktion ruft sich selbst immer wieder auf. Baue eine Abbruch-Bedingung mit "falls" ein, damit der Aufruf-Stapel nicht überläuft.':
     'A function keeps calling itself. Add a termination check with "if" so the call stack does not overflow.',
@@ -368,8 +362,6 @@ const I18N_EN = {
   'MicroPython installieren…':      'Install MicroPython…',
   'MicroPython auf den PBC+ installieren':
     'Install MicroPython on the PBC+',
-  'Vom Computer…':                  'From computer…',
-  'Vom PBC+…':                      'From PBC+…',
   'Dateien auf dem PBC+…':          'Files on the PBC+…',
   'Dateien auf dem PBC+':           'Files on the PBC+',
   'Dateien auf dem':                'Files on the',
@@ -396,7 +388,6 @@ const I18N_EN = {
   'nötig':                          'needed',
   'frei':                           'free',
   'Lade hoch…':                     'Uploading…',
-  'hochgeladen':                    'uploaded',
   'PNG hochladen…':                 'Upload PNG…',
   'ZIP hochladen…':                 'Upload ZIP…',
   'Mehrere PNG-Bilder auf einmal, ohne Bildeditor':
@@ -466,9 +457,6 @@ const I18N_EN = {
   ' ist eine Systemdatei. Wirklich löschen? Das Gerät kann danach kaputt sein!':
     ' is a system file. Really delete? The device may stop working afterwards!',
   ' wirklich löschen?':             ' really delete?',
-  'gelöscht':                       'deleted',
-  'Löschen fehlgeschlagen':         'Delete failed',
-  'Schließen':                      'Close',
   'In einem oder mehreren Sprite-Befehlen ist kein Sprite ausgewählt.':
     'One or more sprite commands have no sprite selected.',
   'Klicke auf den Befehl-Block und wähle aus dem Dropdown ein Sprite aus, oder lösche den Block.':
@@ -523,9 +511,9 @@ const I18N_EN = {
   'Canvas Rechteck %1 %2x %3 y %4 %5Breite %6 Höhe %7 %8Farbe %9':
     'canvas rectangle %1 %2x %3 y %4 %5width %6 height %7 %8color %9',
   'Canvas Ellipse %1 %2Mitte x %3 y %4 %5Breite %6 Höhe %7 %8Farbe %9':
-    'canvas ellipse %1 %2centre x %3 y %4 %5width %6 height %7 %8color %9',
+    'canvas ellipse %1 %2center x %3 y %4 %5width %6 height %7 %8color %9',
   'Canvas Kreis %1 %2Mitte x %3 y %4 %5Radius %6 %7Farbe %8':
-    'canvas circle %1 %2centre x %3 y %4 %5radius %6 %7color %8',
+    'canvas circle %1 %2center x %3 y %4 %5radius %6 %7color %8',
   'kleiner Text auf Canvas':        'small text on canvas',
   'großer Text auf Canvas':         'big text on canvas',
   'Canvas als Sprite-Hintergrund setzen':
@@ -574,10 +562,10 @@ const I18N_EN = {
   'RGB-LED auf Farbe':              'RGB LED to color',
   'Ton für ms abspielen':           'Play tone for ms',
   'Dauerton starten':               'Start tone',
-  'Taste gedrückt?':                'Key pressed?',
-  'Taste vorher gedrückt?':         'Key pressed earlier?',
-  'auf Taste warten':               'Wait for any key',
-  'auf bestimmte Taste warten':     'Wait for specific key',
+  'Taste gedrückt?':                'Button pressed?',
+  'Taste vorher gedrückt?':         'Button pressed earlier?',
+  'auf Taste warten':               'Wait for any button',
+  'auf bestimmte Taste warten':     'Wait for specific button',
   'auf %1 warten':                  'wait for %1',
   'Beschleunigung X/Y/Z (g oder m/s²)':
                                     'Acceleration X/Y/Z (g or m/s²)',
@@ -606,9 +594,9 @@ const I18N_EN = {
   '%1 Rechteck x %2 y %3 b %4 h %5 Farbe %6':
     '%1 rectangle x %2 y %3 w %4 h %5 color %6',
   'Ellipse %1 %2Mitte x %3 y %4 %5Breite %6 Höhe %7 %8Farbe %9':
-    'Ellipse %1 %2centre x %3 y %4 %5width %6 height %7 %8color %9',
+    'Ellipse %1 %2center x %3 y %4 %5width %6 height %7 %8color %9',
   'Kreis %1 %2Mitte x %3 y %4 %5Radius %6 %7Farbe %8':
-    'Circle %1 %2centre x %3 y %4 %5radius %6 %7color %8',
+    'Circle %1 %2center x %3 y %4 %5radius %6 %7color %8',
   'Kreis':                             'Circle',
   'kleiner Text %1 an x %2 y %3 Farbe %4':
     'small text %1 at x %2 y %3 color %4',
@@ -628,7 +616,7 @@ const I18N_EN = {
   'wird %1 gedrückt?':                 'is %1 pressed?',
   'wurde %1 seit der letzten Abfrage gedrückt?':
                                        'was %1 pressed since the last check?',
-  'auf beliebige Taste warten':        'wait for any key',
+  'auf beliebige Taste warten':        'wait for any button',
   'Beschleunigung %1 in %2':           'Acceleration %1 in %2',
   'zeige Sprite %1':                   'show sprite %1',
   'verstecke Sprite %1':               'hide sprite %1',
@@ -676,8 +664,6 @@ const I18N_EN = {
   'RTC: Uhr stellen %1Jahr %2 Monat %3 Tag %4 %5Stunde %6 Minute %7 Sekunde %8':
     'RTC: set clock %1Year %2 month %3 day %4 %5hour %6 minute %7 second %8',
   'RTC: %1':                           'RTC: %1',
-  'SHT40: Temperatur (°C)':            'SHT40: temperature (°C)',
-  'SHT40: Feuchte (%)':                'SHT40: humidity (%)',
 
   // -- Block-internal field labels (set via .appendField in JS) ----
   'Bild':         'Image',
@@ -715,13 +701,21 @@ const I18N_EN = {
   'blau':     'blue',
   'schwarz':  'black',
   'weiß':     'white',
+  'grau':     'gray',
+  'orange':   'orange',
+  'lila':     'purple',
+  'HOCH':     'UP',
+  'RUNTER':   'DOWN',
+  'LINKS':    'LEFT',
+  'RECHTS':   'RIGHT',
+  'MITTE':    'CENTER',
   'cyan':     'cyan',
   'magenta':  'magenta',
   'oben':     'up',
   'unten':    'down',
   'links':    'left',
   'rechts':   'right',
-  'Mitte':    'centre',
+  'Mitte':    'center',
   'A':        'A',
   'B':        'B',
   'X':        'X',
@@ -751,7 +745,6 @@ const I18N_EN = {
   'Auf den PBC+ speichern': 'Save to the PBC+',
   'Wähle einen Dateinamen. Oder klicke auf eine vorhandene Datei, um sie zu überschreiben.':
     'Choose a filename. Or click an existing file to overwrite it.',
-  'Dateiname:': 'Filename:',
   'Bilder verwalten': 'Manage images',
   'Sprite anlegen': 'Create sprite',
   'Lade…': 'Loading…',
@@ -783,7 +776,6 @@ const I18N_EN = {
   'heruntergeladen': 'downloaded',
   'Herunterladen fehlgeschlagen': 'Download failed',
   'Bitte Dateinamen eingeben.': 'Please enter a filename.',
-  'Speichern fehlgeschlagen': 'Save failed',
   'Bild speichern': 'Save image',
   'Dateiname:': 'Filename:',
   'Keine Leerzeichen oder /\\\'\"\` erlaubt.':
@@ -842,7 +834,6 @@ const I18N_EN = {
   'Stop gesendet':                'Stop sent',
   'Speichern:':                   'Saving:',
   'Hochladen:':                   'Uploading:',
-  'fertig':                       'done',
   'Verbindung zum Gerät verloren':'Connection to device lost',
   'keine OK-Quittung':            'no OK acknowledgement',
   // Added with build 137 (English pass over dialogs and messages).
@@ -1016,7 +1007,7 @@ const I18N_EN = {
     "Other image…",
   "Neues Bild zeichnen":
     "Draw new image",
-  "Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel gross; ein ganzes Display ist 240×280.":
+  "Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel groß; ein ganzes Display ist 240×280.":
     "Choose the size of the image. Sprites are typically 16–48 pixels; a whole display is 240×280.",
   "Höhe:":
     "Height:",
@@ -1052,6 +1043,32 @@ const I18N_EN = {
     "Controls: tap the joystick and buttons, or arrows · A · B · space",
   "Ziehen = Gerät kippen, Doppelklick = flach hinlegen":
     "Drag = tilt device, double-click = lay flat",
+
+  // -- static dialog texts that were still German (Build 142) ----------
+  'Dein Modul fehlt?': 'Is your module missing?',
+  'Neues Sprite': 'New sprite',
+  'Anlegen': 'Create',
+  'Aktualisieren': 'Refresh',
+  'Ausschnitt (Original)': 'Crop (original)',
+  'Skalierung': 'Scale',
+  'Dateiname': 'Filename',
+  'Breite:': 'Width:',
+  'Werkzeug': 'Tool',
+  'Stift': 'Pen',
+  '⌫ Radieren': '⌫ Erase',
+  'Generiertes Python': 'Generated Python',
+  'Bearbeitung aktivieren': 'Enable editing',
+  'Neigungssensor': 'Tilt sensor',
+  'Punkt ziehen = kippen,': 'Drag the dot = tilt,',
+  'Doppelklick = flach': 'double-click = flat',
+  'Hinweis:': 'Note:',
+  'Der Emulator führt MicroPython im Browser aus. Manche Funktionen sind eingeschränkt: das Modul':
+    'The emulator runs MicroPython in the browser. Some features are limited: the module',
+  ', die Genauigkeit von': ', the accuracy of',
+  ', hardwarespezifische Tricks.': ', hardware-specific tricks.',
+  'fertig': 'done',
+  'Hinweis Zeile %1:': 'Note, line %1:',
+  'Datenschutz': 'Privacy',
 };
 
 function t(s) {

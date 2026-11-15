@@ -1933,7 +1933,7 @@ function listSpriteNames() {
 // Blockly when the block is first rendered AND whenever the field
 // gets opened, so we always show the current list.
 function spriteNameOptions() {
-  if (PBC_SPRITES.length === 0) return [['(kein Sprite)', '']];
+  if (PBC_SPRITES.length === 0) return [[t('(kein Sprite)'), '']];
   return PBC_SPRITES.map(s => [s.name, s.name]);
 }
 
@@ -2001,7 +2001,7 @@ function renderSpriteButtons(body) {
   // here explicitly.
   const hdr = document.createElement('div');
   hdr.className = 'sec-header';
-  hdr.textContent = 'Befehle';
+  hdr.textContent = t('Befehle');
   body.appendChild(hdr);
 
   PBC_BLOCKS.filter(b => blockInCategory(b, 'sprite')).forEach(entry => {

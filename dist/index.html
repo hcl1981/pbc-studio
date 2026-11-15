@@ -622,6 +622,8 @@
   .text-banner #text-banner-msg {
     flex: 1; color: var(--fg-1); font-size: 13px;
   }
+  /* left of the message: on the right the docked emulator panel covers it */
+  .text-banner #btn-edit-on { order: -1; }
   .text-banner.unlocked #text-banner-msg {
     color: var(--fg-0); font-weight: 500;
   }
@@ -1000,6 +1002,7 @@
 <footer class="page-footer">
   <a data-action="contact" id="footer-contact">Kontakt</a>
   <a data-action="impressum" id="footer-impressum">Impressum</a>
+  <a data-action="datenschutz" id="footer-datenschutz">Datenschutz</a>
 </footer>
 
 <input type="file" class="hidden" id="file-open" accept=".pbcp,.xml,.py,.json">
@@ -1406,7 +1409,7 @@
     <h2 style="margin-top:0;">Neues Bild zeichnen</h2>
     <div style="color:var(--fg-1);font-size:13px;margin-bottom:14px;">
       Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel
-      gross; ein ganzes Display ist 240×280.
+      groß; ein ganzes Display ist 240×280.
     </div>
     <!-- Preset size grid. Click selects + closes. The +Custom row
          lets the user enter arbitrary dimensions. -->
@@ -1750,8 +1753,8 @@
               background:var(--bg-3);border-left:3px solid var(--warn);
               color:var(--fg-1);font-size:11px;border-radius:4px;">
     <strong>Hinweis:</strong> Der Emulator führt MicroPython im Browser aus.
-    Manche Funktionen sind eingeschränkt: <code>machine</code>-Modul,
-    exakte <code>time.sleep</code>-Genauigkeit, hardwarespezifische Tricks.
+    Manche Funktionen sind eingeschränkt: das Modul <code>machine</code>,
+    die Genauigkeit von <code>time.sleep</code>, hardwarespezifische Tricks.
   </div>
 </div>
 
@@ -1785,8 +1788,8 @@
 // by one with every build (no manual version bookkeeping needed). Shown
 // only in the terminal banner. APP_BUILD doubles as the internal build
 // marker, so there's a single source of truth.
-const APP_BUILD = 141;
-const APP_DATE  = '2026-11-12';   // build.py sets the day of the build
+const APP_BUILD = 142;
+const APP_DATE  = '2026-11-15';   // build.py sets the day of the build
 
 /* =====================================================================
  * Quiet Blockly's internal deprecation warning. Blockly 12's own
@@ -2012,17 +2015,14 @@ const I18N_EN = {
   '▶ Testen': '▶ Run',
   '■ Stop': '■ Stop',
   'Verbinden': 'Connect',
-  'Trennen': 'Disconnect',
   'Konsole leeren': 'Clear console',
   'Soft-Reset': 'Soft reset',
   'NICHT VERBUNDEN': 'NOT CONNECTED',
-  'nicht verbunden': 'not connected',
   'Seriell / REPL': 'Serial / REPL',
 
   // -- Dateien dropdown ----------------------------------------------
   'Neu': 'New',
   'Öffnen…': 'Open…',
-  'Speichern': 'Save',
   'Auf den Computer…': 'To this computer…',
   'Impressum': 'Legal notice',
   'Kontakt': 'Contact',
@@ -2124,7 +2124,7 @@ const I18N_EN = {
   'Joystick unten':  'Joystick down',
   'Joystick links':  'Joystick left',
   'Joystick rechts': 'Joystick right',
-  'Joystick Mitte':  'Joystick centre',
+  'Joystick Mitte':  'Joystick center',
   'wurde gedrückt A': 'A pressed',
   'wurde gedrückt B': 'B pressed',
   'Beschleunigung X': 'Acceleration X',
@@ -2165,15 +2165,15 @@ const I18N_EN = {
   'Dieser Name wird in dieser Funktion schon verwendet.':
     'This name is already used in this function.',
   'lokale Variable': 'local variable',
-  'wert': 'value',
   'Noch keine Sprites.': 'No sprites yet.',
-  'Befehle': 'Commands',
   'zeige Sprite': 'show sprite',
   'verstecke Sprite': 'hide sprite',
   'Sprite setzen auf x/y': 'set sprite to x/y',
   'Sprite versetzen um dx/dy': 'move sprite by dx/dy',
-  'Sprite nach x/y gleiten': 'glide sprite to x/y',
-  'Sprite um dx/dy gleiten': 'glide sprite by dx/dy',
+  'gleite Sprite nach x/y': 'glide sprite to x/y',
+  'gleite Sprite um dx/dy': 'glide sprite by dx/dy',
+  '(kein Sprite)': '(no sprite)',
+  '(kein Parameter)': '(no parameter)',
   'x von Sprite': 'sprite x',
   'y von Sprite': 'sprite y',
   'Sprite berührt Sprite': 'sprite touches sprite',
@@ -2264,7 +2264,6 @@ const I18N_EN = {
   'Klicke auf den Bild-Block und wähle eine Datei aus der Liste. Falls die Liste leer ist, lade zuerst über Dateien → Bilder verwalten ein PNG hoch.':
     'Click the image block and pick a file from the list. If the list is empty, first upload a PNG via Files → Manage images.',
   'Sprite-Befehl ohne Sprite':      'Sprite command without sprite',
-  'Sprite-Befehl ohne Sprite':      'Sprite command without sprite',
   'Funktionsaufruf ohne Funktion':  'Function call without function',
   'Diese Funktionen werden aufgerufen, aber nicht (mehr) definiert:':
     'These functions are called but not (any longer) defined:',
@@ -2299,14 +2298,12 @@ const I18N_EN = {
   'Ein Wert hatte ein unerwartetes Format. Schau in die rote Fehlermeldung im Terminal, um zu sehen welcher.':
     'A value had an unexpected format. Check the red error message in the terminal to see which.',
   'Unbekannter Name':               'Unknown name',
-  'Das Programm kennt den Namen "':
-    'The program does not know the name "',
-  '" nicht.':                       '".',
+  'Das Programm kennt den Namen "%1" nicht.':
+    'The program does not know the name "%1".',
   'Das Programm kennt einen Namen nicht.':
     'The program references a name it does not know.',
   'Häufige Ursachen: Variable noch nicht angelegt, Sprite gelöscht, Funktion umbenannt.':
     'Common causes: variable not yet created, sprite deleted, function renamed.',
-  'nicht.':                         'not defined.',
   'Endlose Selbst-Aufrufe':         'Endless self-calls',
   'Eine Funktion ruft sich selbst immer wieder auf. Baue eine Abbruch-Bedingung mit "falls" ein, damit der Aufruf-Stapel nicht überläuft.':
     'A function keeps calling itself. Add a termination check with "if" so the call stack does not overflow.',
@@ -2351,8 +2348,6 @@ const I18N_EN = {
   'MicroPython installieren…':      'Install MicroPython…',
   'MicroPython auf den PBC+ installieren':
     'Install MicroPython on the PBC+',
-  'Vom Computer…':                  'From computer…',
-  'Vom PBC+…':                      'From PBC+…',
   'Dateien auf dem PBC+…':          'Files on the PBC+…',
   'Dateien auf dem PBC+':           'Files on the PBC+',
   'Dateien auf dem':                'Files on the',
@@ -2379,7 +2374,6 @@ const I18N_EN = {
   'nötig':                          'needed',
   'frei':                           'free',
   'Lade hoch…':                     'Uploading…',
-  'hochgeladen':                    'uploaded',
   'PNG hochladen…':                 'Upload PNG…',
   'ZIP hochladen…':                 'Upload ZIP…',
   'Mehrere PNG-Bilder auf einmal, ohne Bildeditor':
@@ -2449,9 +2443,6 @@ const I18N_EN = {
   ' ist eine Systemdatei. Wirklich löschen? Das Gerät kann danach kaputt sein!':
     ' is a system file. Really delete? The device may stop working afterwards!',
   ' wirklich löschen?':             ' really delete?',
-  'gelöscht':                       'deleted',
-  'Löschen fehlgeschlagen':         'Delete failed',
-  'Schließen':                      'Close',
   'In einem oder mehreren Sprite-Befehlen ist kein Sprite ausgewählt.':
     'One or more sprite commands have no sprite selected.',
   'Klicke auf den Befehl-Block und wähle aus dem Dropdown ein Sprite aus, oder lösche den Block.':
@@ -2506,9 +2497,9 @@ const I18N_EN = {
   'Canvas Rechteck %1 %2x %3 y %4 %5Breite %6 Höhe %7 %8Farbe %9':
     'canvas rectangle %1 %2x %3 y %4 %5width %6 height %7 %8color %9',
   'Canvas Ellipse %1 %2Mitte x %3 y %4 %5Breite %6 Höhe %7 %8Farbe %9':
-    'canvas ellipse %1 %2centre x %3 y %4 %5width %6 height %7 %8color %9',
+    'canvas ellipse %1 %2center x %3 y %4 %5width %6 height %7 %8color %9',
   'Canvas Kreis %1 %2Mitte x %3 y %4 %5Radius %6 %7Farbe %8':
-    'canvas circle %1 %2centre x %3 y %4 %5radius %6 %7color %8',
+    'canvas circle %1 %2center x %3 y %4 %5radius %6 %7color %8',
   'kleiner Text auf Canvas':        'small text on canvas',
   'großer Text auf Canvas':         'big text on canvas',
   'Canvas als Sprite-Hintergrund setzen':
@@ -2557,10 +2548,10 @@ const I18N_EN = {
   'RGB-LED auf Farbe':              'RGB LED to color',
   'Ton für ms abspielen':           'Play tone for ms',
   'Dauerton starten':               'Start tone',
-  'Taste gedrückt?':                'Key pressed?',
-  'Taste vorher gedrückt?':         'Key pressed earlier?',
-  'auf Taste warten':               'Wait for any key',
-  'auf bestimmte Taste warten':     'Wait for specific key',
+  'Taste gedrückt?':                'Button pressed?',
+  'Taste vorher gedrückt?':         'Button pressed earlier?',
+  'auf Taste warten':               'Wait for any button',
+  'auf bestimmte Taste warten':     'Wait for specific button',
   'auf %1 warten':                  'wait for %1',
   'Beschleunigung X/Y/Z (g oder m/s²)':
                                     'Acceleration X/Y/Z (g or m/s²)',
@@ -2589,9 +2580,9 @@ const I18N_EN = {
   '%1 Rechteck x %2 y %3 b %4 h %5 Farbe %6':
     '%1 rectangle x %2 y %3 w %4 h %5 color %6',
   'Ellipse %1 %2Mitte x %3 y %4 %5Breite %6 Höhe %7 %8Farbe %9':
-    'Ellipse %1 %2centre x %3 y %4 %5width %6 height %7 %8color %9',
+    'Ellipse %1 %2center x %3 y %4 %5width %6 height %7 %8color %9',
   'Kreis %1 %2Mitte x %3 y %4 %5Radius %6 %7Farbe %8':
-    'Circle %1 %2centre x %3 y %4 %5radius %6 %7color %8',
+    'Circle %1 %2center x %3 y %4 %5radius %6 %7color %8',
   'Kreis':                             'Circle',
   'kleiner Text %1 an x %2 y %3 Farbe %4':
     'small text %1 at x %2 y %3 color %4',
@@ -2611,7 +2602,7 @@ const I18N_EN = {
   'wird %1 gedrückt?':                 'is %1 pressed?',
   'wurde %1 seit der letzten Abfrage gedrückt?':
                                        'was %1 pressed since the last check?',
-  'auf beliebige Taste warten':        'wait for any key',
+  'auf beliebige Taste warten':        'wait for any button',
   'Beschleunigung %1 in %2':           'Acceleration %1 in %2',
   'zeige Sprite %1':                   'show sprite %1',
   'verstecke Sprite %1':               'hide sprite %1',
@@ -2659,8 +2650,6 @@ const I18N_EN = {
   'RTC: Uhr stellen %1Jahr %2 Monat %3 Tag %4 %5Stunde %6 Minute %7 Sekunde %8':
     'RTC: set clock %1Year %2 month %3 day %4 %5hour %6 minute %7 second %8',
   'RTC: %1':                           'RTC: %1',
-  'SHT40: Temperatur (°C)':            'SHT40: temperature (°C)',
-  'SHT40: Feuchte (%)':                'SHT40: humidity (%)',
 
   // -- Block-internal field labels (set via .appendField in JS) ----
   'Bild':         'Image',
@@ -2698,13 +2687,21 @@ const I18N_EN = {
   'blau':     'blue',
   'schwarz':  'black',
   'weiß':     'white',
+  'grau':     'gray',
+  'orange':   'orange',
+  'lila':     'purple',
+  'HOCH':     'UP',
+  'RUNTER':   'DOWN',
+  'LINKS':    'LEFT',
+  'RECHTS':   'RIGHT',
+  'MITTE':    'CENTER',
   'cyan':     'cyan',
   'magenta':  'magenta',
   'oben':     'up',
   'unten':    'down',
   'links':    'left',
   'rechts':   'right',
-  'Mitte':    'centre',
+  'Mitte':    'center',
   'A':        'A',
   'B':        'B',
   'X':        'X',
@@ -2734,7 +2731,6 @@ const I18N_EN = {
   'Auf den PBC+ speichern': 'Save to the PBC+',
   'Wähle einen Dateinamen. Oder klicke auf eine vorhandene Datei, um sie zu überschreiben.':
     'Choose a filename. Or click an existing file to overwrite it.',
-  'Dateiname:': 'Filename:',
   'Bilder verwalten': 'Manage images',
   'Sprite anlegen': 'Create sprite',
   'Lade…': 'Loading…',
@@ -2766,7 +2762,6 @@ const I18N_EN = {
   'heruntergeladen': 'downloaded',
   'Herunterladen fehlgeschlagen': 'Download failed',
   'Bitte Dateinamen eingeben.': 'Please enter a filename.',
-  'Speichern fehlgeschlagen': 'Save failed',
   'Bild speichern': 'Save image',
   'Dateiname:': 'Filename:',
   'Keine Leerzeichen oder /\\\'\"\` erlaubt.':
@@ -2825,7 +2820,6 @@ const I18N_EN = {
   'Stop gesendet':                'Stop sent',
   'Speichern:':                   'Saving:',
   'Hochladen:':                   'Uploading:',
-  'fertig':                       'done',
   'Verbindung zum Gerät verloren':'Connection to device lost',
   'keine OK-Quittung':            'no OK acknowledgement',
   // Added with build 137 (English pass over dialogs and messages).
@@ -2999,7 +2993,7 @@ const I18N_EN = {
     "Other image…",
   "Neues Bild zeichnen":
     "Draw new image",
-  "Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel gross; ein ganzes Display ist 240×280.":
+  "Wähle die Größe des Bildes. Sprites sind typisch 16–48 Pixel groß; ein ganzes Display ist 240×280.":
     "Choose the size of the image. Sprites are typically 16–48 pixels; a whole display is 240×280.",
   "Höhe:":
     "Height:",
@@ -3035,6 +3029,32 @@ const I18N_EN = {
     "Controls: tap the joystick and buttons, or arrows · A · B · space",
   "Ziehen = Gerät kippen, Doppelklick = flach hinlegen":
     "Drag = tilt device, double-click = lay flat",
+
+  // -- static dialog texts that were still German (Build 142) ----------
+  'Dein Modul fehlt?': 'Is your module missing?',
+  'Neues Sprite': 'New sprite',
+  'Anlegen': 'Create',
+  'Aktualisieren': 'Refresh',
+  'Ausschnitt (Original)': 'Crop (original)',
+  'Skalierung': 'Scale',
+  'Dateiname': 'Filename',
+  'Breite:': 'Width:',
+  'Werkzeug': 'Tool',
+  'Stift': 'Pen',
+  '⌫ Radieren': '⌫ Erase',
+  'Generiertes Python': 'Generated Python',
+  'Bearbeitung aktivieren': 'Enable editing',
+  'Neigungssensor': 'Tilt sensor',
+  'Punkt ziehen = kippen,': 'Drag the dot = tilt,',
+  'Doppelklick = flach': 'double-click = flat',
+  'Hinweis:': 'Note:',
+  'Der Emulator führt MicroPython im Browser aus. Manche Funktionen sind eingeschränkt: das Modul':
+    'The emulator runs MicroPython in the browser. Some features are limited: the module',
+  ', die Genauigkeit von': ', the accuracy of',
+  ', hardwarespezifische Tricks.': ', hardware-specific tricks.',
+  'fertig': 'done',
+  'Hinweis Zeile %1:': 'Note, line %1:',
+  'Datenschutz': 'Privacy',
 };
 
 function t(s) {
@@ -7486,7 +7506,7 @@ function methodParamOptions() {
   const current = (field && typeof field.getValue === 'function')
     ? field.getValue() : '';
   push(current);
-  if (names.length === 0) return [['(kein Parameter)', '']];
+  if (names.length === 0) return [[t('(kein Parameter)'), '']];
   return names.map(n => [n, n]);
 }
 
@@ -7815,7 +7835,7 @@ Blockly.defineBlocksWithJsonArray([{
         ['−',   'SUB'],
         ['×',   'MUL'],
         ['÷',   'DIV'],
-        ['Rest','MOD'],
+        [t('Rest'),'MOD'],
       ] },
     { type: 'input_value', name: 'B', check: 'Number' },
   ],
@@ -9874,7 +9894,7 @@ function listSpriteNames() {
 // Blockly when the block is first rendered AND whenever the field
 // gets opened, so we always show the current list.
 function spriteNameOptions() {
-  if (PBC_SPRITES.length === 0) return [['(kein Sprite)', '']];
+  if (PBC_SPRITES.length === 0) return [[t('(kein Sprite)'), '']];
   return PBC_SPRITES.map(s => [s.name, s.name]);
 }
 
@@ -9942,7 +9962,7 @@ function renderSpriteButtons(body) {
   // here explicitly.
   const hdr = document.createElement('div');
   hdr.className = 'sec-header';
-  hdr.textContent = 'Befehle';
+  hdr.textContent = t('Befehle');
   body.appendChild(hdr);
 
   PBC_BLOCKS.filter(b => blockInCategory(b, 'sprite')).forEach(entry => {
@@ -12183,7 +12203,7 @@ function pyVorpruefungZeigen() {
   pyFehlerzeileLoeschen();
   const w = pyVorpruefung(codeEditor.getValue());
   for (const x of w.slice(0, 8)) {
-    term.write('\x1b[33mHinweis Zeile ' + x.zeile + ': ' + x.text + '\x1b[0m\r\n');
+    term.write('\x1b[33m' + t('Hinweis Zeile %1:').replace('%1', x.zeile) + ' ' + x.text + '\x1b[0m\r\n');
   }
 }
 /* =====================================================================
@@ -12384,7 +12404,7 @@ for n in sorted(os.listdir('/')):
 
     if (files.length === 0) {
       list.innerHTML = '<div style="color:var(--fg-2);padding:16px;">' +
-        'Keine <code>.py</code>-Dateien auf dem Gerät.</div>';
+        t('Keine .py-Dateien auf dem Gerät.').replace('.py', '<code>.py</code>') + '</div>';
       return;
     }
 
@@ -14650,7 +14670,7 @@ function showInstallMicroPythonDialog() {
        border-radius:6px; padding:9px 11px; margin:12px 0;">
       <b>⚠ Warning:</b> Flashing erases <b>everything</b> on the PBC+ –
       all your programs, images and saved files. If you want to keep them,
-      create a backup first via <b>File → Create flash backup (.uf2)…</b>
+      create a backup first via <b>Files → Create flash backup (.uf2)…</b>
       before you continue.
     </p>
 
@@ -14690,7 +14710,7 @@ function showInstallMicroPythonDialog() {
       <b>⚠ Achtung:</b> Beim Flashen wird <b>alles</b> auf dem PBC+
       gelöscht – alle deine Programme, Bilder und gespeicherten Dateien.
       Wenn du sie behalten möchtest, erstelle vorher ein Backup über
-      <b>Datei → Flash-Backup erstellen (.uf2)…</b>, bevor du fortfährst.
+      <b>Dateien → Flash-Backup erstellen (.uf2)…</b>, bevor du fortfährst.
     </p>
 
     <ol style="margin:14px 0 14px 22px; padding:0;">
@@ -15267,6 +15287,117 @@ function showImpressumDialog() {
   setTimeout(() => ok.focus(), 0);
 }
 
+// Privacy notice. States what the page really does: static hosting,
+// libraries from two CDNs, the contact form (kontakt.php), browser
+// storage. Keep it in step with head.html and kontakt.php.
+function showDatenschutzDialog() {
+  const { overlay, dialog, close } = buildModalShell(t('Datenschutz'));
+  const body = document.createElement('div');
+  body.className = 'modal-body';
+  body.style.cssText = 'font-size:13.5px; line-height:1.6; max-height:65vh; overflow:auto;';
+  body.innerHTML = (LANG === 'en') ? `
+    <p><b>Controller</b><br>
+       Jan Schulz, Mondorfer Str. 28, 53844 Troisdorf, Germany<br>
+       E-mail: <a class="imp-email" style="color:var(--accent);"></a></p>
+    <p><b>In short</b><br>
+       PBC+ Studio needs no account, sets no cookies and uses no tracking
+       or advertising. Your programs and images stay in your browser or on
+       your PBC+; they are not sent to a server.</p>
+    <p><b>Opening the page (hosting)</b><br>
+       The page is hosted by STRATO GmbH, Berlin, Germany. When you open it,
+       the web server processes your IP address, the time and the requested
+       file, and keeps them in log files for a short time, to deliver the
+       page and keep it secure (Art. 6(1)(f) GDPR).</p>
+    <p><b>Libraries from content delivery networks</b><br>
+       The editor loads Blockly, CodeMirror and xterm.js from
+       <i>cdnjs</i> (Cloudflare, Inc., USA) and <i>jsDelivr</i> (Volentio
+       JSD Limited, UK, with servers of further providers). Your browser
+       connects to these services, which see your IP address. This is
+       needed for the page to work (Art. 6(1)(f) GDPR). No other data is
+       sent to them.</p>
+    <p><b>Contact form and hardware request</b><br>
+       If you send a message, your text, the name and e-mail address you
+       enter (both optional) and your IP address are sent to me by e-mail,
+       so I can answer and prevent abuse (Art. 6(1)(f) GDPR). To limit
+       spam, the server temporarily keeps the time of your message under
+       a hash of your IP address. I delete
+       messages once they have been dealt with.</p>
+    <p><b>Storage in your browser</b><br>
+       Settings (language, font size, sensors), your current program and
+       the emulator's files and images are stored locally in your browser
+       (localStorage / IndexedDB). They stay on your device; you can remove
+       them by clearing the site data in your browser.</p>
+    <p><b>PBC+ via USB</b><br>
+       The connection to the PBC+ (Web Serial) runs only between your
+       browser and the device.</p>
+    <p><b>Your rights</b><br>
+       You have the right of access, rectification, erasure, restriction
+       of processing, data portability and objection (Art. 15–21 GDPR), and
+       you may lodge a complaint with a data protection supervisory
+       authority.</p>
+  ` : `
+    <p><b>Verantwortlicher</b><br>
+       Jan Schulz, Mondorfer Str. 28, 53844 Troisdorf<br>
+       E-Mail: <a class="imp-email" style="color:var(--accent);"></a></p>
+    <p><b>Kurz gesagt</b><br>
+       PBC+ Studio braucht kein Konto, setzt keine Cookies und nutzt weder
+       Tracking noch Werbung. Deine Programme und Bilder bleiben in deinem
+       Browser oder auf deinem PBC+; sie werden nicht an einen Server
+       geschickt.</p>
+    <p><b>Aufruf der Seite (Hosting)</b><br>
+       Die Seite liegt bei der STRATO GmbH, Berlin. Beim Aufruf verarbeitet
+       der Webserver deine IP-Adresse, den Zeitpunkt und die abgerufene
+       Datei und speichert sie kurzzeitig in Protokolldateien, um die Seite
+       auszuliefern und sicher zu betreiben (Art. 6 Abs. 1 lit. f DSGVO).</p>
+    <p><b>Bibliotheken von Content-Delivery-Netzen</b><br>
+       Der Editor lädt Blockly, CodeMirror und xterm.js von
+       <i>cdnjs</i> (Cloudflare, Inc., USA) und <i>jsDelivr</i> (Volentio
+       JSD Limited, Großbritannien, mit Servern weiterer Anbieter). Dein
+       Browser baut dafür eine Verbindung zu diesen Diensten auf; sie
+       erfahren dabei deine IP-Adresse. Das ist nötig, damit die Seite
+       funktioniert (Art. 6 Abs. 1 lit. f DSGVO). Weitere Daten werden
+       dorthin nicht übertragen.</p>
+    <p><b>Kontaktformular und Hardware-Wunsch</b><br>
+       Wenn du eine Nachricht abschickst, gehen dein Text, der angegebene
+       Name und die E-Mail-Adresse (beides freiwillig) sowie deine
+       IP-Adresse per E-Mail an mich, damit ich antworten und Missbrauch
+       verhindern kann (Art. 6 Abs. 1 lit. f DSGVO). Zum Schutz vor Spam
+       merkt sich der Server den Zeitpunkt deiner Nachricht vorübergehend
+       unter einem Hashwert deiner IP-Adresse. Nachrichten lösche ich, sobald das Anliegen erledigt ist.</p>
+    <p><b>Speicher in deinem Browser</b><br>
+       Einstellungen (Sprache, Schriftgröße, Sensoren), dein aktuelles
+       Programm sowie die Dateien und Bilder des Emulators liegen lokal in
+       deinem Browser (localStorage / IndexedDB). Sie bleiben auf deinem
+       Gerät; du entfernst sie, indem du die Website-Daten im Browser
+       löschst.</p>
+    <p><b>PBC+ per USB</b><br>
+       Die Verbindung zum PBC+ (Web Serial) läuft nur zwischen deinem
+       Browser und dem Gerät.</p>
+    <p><b>Deine Rechte</b><br>
+       Du hast das Recht auf Auskunft, Berichtigung, Löschung,
+       Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch
+       (Art. 15–21 DSGVO) und kannst dich bei einer
+       Datenschutz-Aufsichtsbehörde beschweren.</p>
+  `;
+  const _addr = 'info' + '@' + 'picoboy.de';
+  const _emailEl = body.querySelector('.imp-email');
+  if (_emailEl) {
+    _emailEl.textContent = _addr;
+    _emailEl.setAttribute('href', 'mailto:' + _addr);
+  }
+  dialog.appendChild(body);
+  const foot = document.createElement('div');
+  foot.className = 'modal-foot';
+  const ok = document.createElement('button');
+  ok.className = 'tb-btn primary';
+  ok.textContent = t('Schließen');
+  ok.addEventListener('click', close);
+  foot.appendChild(ok);
+  dialog.appendChild(foot);
+  document.body.appendChild(overlay);
+  setTimeout(() => ok.focus(), 0);
+}
+
 // Shared form renderer. `kind` is 'contact' or 'hardware'. Builds the
 // fields, the honeypot, the open-timer, and the submit handler.
 function showMessageForm(kind) {
@@ -15428,6 +15559,7 @@ if (LANG === 'en') {
 }
 _fcEl?.addEventListener('click', () => showContactDialog());
 _fiEl?.addEventListener('click', () => showImpressumDialog());
+document.getElementById('footer-datenschutz')?.addEventListener('click', () => showDatenschutzDialog());
 
 document.getElementById('btn-test').addEventListener('click', async () => {
   const code = fullProgram();
@@ -15640,15 +15772,14 @@ async function showFriendlyErrorHint(stderr) {
     // Text mode: a module name usually means the import line is missing.
     if (isTextMode && /^(pbc|time|random|math|turtle|os)$/.test(which || '')) {
       await alertDialog(tx('Unbekannter Name'),
-        tx('Das Programm kennt den Namen "') + which + '" ' + tx('nicht.') + ' ' +
+        tx('Das Programm kennt den Namen "%1" nicht.').replace('%1', which) + ' ' +
         (LANG === 'en' ? 'Add the line  import ' + which + '  at the top of your program.'
                        : 'Schreibe ganz oben in dein Programm die Zeile  import ' + which));
       return;
     }
     await alertDialog(tx('Unbekannter Name'),
       (which
-        ? tx('Das Programm kennt den Namen "') + which + '" ' +
-          tx('nicht.')
+        ? tx('Das Programm kennt den Namen "%1" nicht.').replace('%1', which)
         : tx('Das Programm kennt einen Namen nicht.')) + ' ' +
       tx('Häufige Ursachen: Variable noch nicht angelegt, Sprite ' +
         'gelöscht, Funktion umbenannt.'));
@@ -17767,7 +17898,7 @@ async function emuWorkerRun(code) {
 async function wkErgebnisMelden(ergebnis) {
   let msg = ergebnis.fehler;
   if (!msg) {
-    term.write('\r\n\x1b[32m-- fertig --\x1b[0m\r\n');
+    term.write('\r\n\x1b[32m-- ' + t('fertig') + ' --\x1b[0m\r\n');
     return;
   }
   if (ergebnis.abgebrochen || /KeyboardInterrupt/.test(msg)) {
