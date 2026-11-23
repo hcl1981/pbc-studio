@@ -335,7 +335,7 @@ function findTurtleCommandsWithoutConstructor() {
 // every .py and .pbcp file on it shows up as a runnable program.
 async function installLauncher() {
   if (!serialPort) { toast(t('Erst verbinden.'), 'warn'); return; }
-  const ok = confirm(
+  const ok = await confirmDialog('',
     t('Das Startmenü wird als main.py auf dem PBC+ installiert. ' +
       'Beim nächsten Start zeigt das Gerät die Liste aller Programme.\n\n' +
       'Falls schon eine main.py existiert, wird sie zu main(2).py ' +
@@ -1028,7 +1028,7 @@ async function showManageFilesDialog() {
         const prompt = f.critical
           ? f.name + t(' ist eine Systemdatei. Wirklich löschen? Das Gerät kann danach kaputt sein!')
           : f.name + t(' wirklich löschen?');
-        if (!confirm(prompt)) return;
+        if (!(await confirmDelete(prompt))) return;
         const r = emuFiles
           ? (await window.__emuImgDelete(f.name), { stdout: '', stderr: '' })
           : await runOnDevice(
@@ -1934,32 +1934,7 @@ function showMessageForm(kind) {
 function showContactDialog()      { showMessageForm('contact'); }
 function showHardwareWishDialog() { showMessageForm('hardware'); }
 
-// Small yes/no dialog (Promise<boolean>). Used for the "forgot email?"
-// prompt. Mirrors alertDialog's styling.
-function confirmDialog(title, message, yesLabel, noLabel) {
-  return new Promise((resolve) => {
-    const { overlay, dialog, close } = buildModalShell(title || t('Bitte bestätigen'));
-    const body = document.createElement('div');
-    body.className = 'modal-body';
-    body.style.cssText = 'font-size:13px; line-height:1.5;';
-    body.textContent = message || '';
-    dialog.appendChild(body);
-    const foot = document.createElement('div');
-    foot.className = 'modal-foot';
-    const no = document.createElement('button');
-    no.className = 'tb-btn';
-    no.textContent = noLabel || t('Abbrechen');
-    no.addEventListener('click', () => { close(); resolve(false); });
-    const yes = document.createElement('button');
-    yes.className = 'tb-btn primary';
-    yes.textContent = yesLabel || 'OK';
-    yes.addEventListener('click', () => { close(); resolve(true); });
-    foot.appendChild(no); foot.appendChild(yes);
-    dialog.appendChild(foot);
-    document.body.appendChild(overlay);
-    setTimeout(() => yes.focus(), 0);
-  });
-}
+// (The yes/no dialog confirmDialog is in 50_seitenleiste.js.)
 
 // Wire the footer links.
 const _fcEl = document.getElementById('footer-contact');
@@ -1968,9 +1943,10 @@ if (LANG === 'en') {
   if (_fcEl) _fcEl.textContent = t('Kontakt');
   if (_fiEl) _fiEl.textContent = t('Impressum');
 }
-_fcEl?.addEventListener('click', () => showContactDialog());
-_fiEl?.addEventListener('click', () => showImpressumDialog());
-document.getElementById('footer-datenschutz')?.addEventListener('click', () => showDatenschutzDialog());
+// real links (href="#") so the keyboard reaches them; the click must not jump to "#"
+_fcEl?.addEventListener('click', (e) => { e.preventDefault(); showContactDialog(); });
+_fiEl?.addEventListener('click', (e) => { e.preventDefault(); showImpressumDialog(); });
+document.getElementById('footer-datenschutz')?.addEventListener('click', (e) => { e.preventDefault(); showDatenschutzDialog(); });
 
 document.getElementById('btn-test').addEventListener('click', async () => {
   const code = fullProgram();
@@ -2470,7 +2446,7 @@ async function saveToDevice() {
     if (s.textContent === name) overwrite = true;
   });
   if (overwrite &&
-      !confirm(t('„%1“ gibt es schon auf dem PBC+. Überschreiben?').replace('%1', name))) {
+      !(await confirmDialog(t('„%1“ gibt es schon auf dem PBC+. Überschreiben?').replace('%1', name)))) {
     return;
   }
 

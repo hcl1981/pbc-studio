@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the single-file PBC+ Studio from src/.
 
-    python3 build.py            -> dist/index.html (+ dist/.htaccess)
+    python3 build.py            -> dist/index.html (+ dist/.htaccess, dist/robots.txt)
 
 Layout of src/:
   head.html, style.css, body.html, tail.html   page skeleton
@@ -86,6 +86,7 @@ def baue():
     # from next to index.html, like the original
     import shutil
     shutil.copyfile(os.path.join(SRC, 'pbcp.png'), os.path.join(DIST, 'pbcp.png'))
+    shutil.copyfile(os.path.join(SRC, 'robots.txt'), os.path.join(DIST, 'robots.txt'))
     ht = os.path.join(SRC, 'htaccess')
     if os.path.exists(ht):
         with open(os.path.join(DIST, '.htaccess'), 'w') as f:

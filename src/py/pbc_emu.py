@@ -46,14 +46,17 @@ def color(r, g, b):
 # as the canonical name.
 rgb = color
 
-# Active drawing surface. When a turtle (or canvas-based program) is
-# running, it registers its Canvas here so that the plain pbc.fill /
-# pbc.line / pbc.pixel / ... display calls draw onto that SAME canvas
-# instead of straight to the framebuffer. Without this, mixing a
-# "Bildschirm füllen" block with turtle drawing produced two
-# independent buffers -- the turtle's canvas would overwrite the
-# fill (or vice versa) and the screen looked wrong/black. None means
-# "draw directly to the display" (the normal, no-turtle case).
+# Active drawing surface (block mode only). When a turtle (or canvas-
+# based program) is running, it registers its Canvas here so that
+# pbc.fill and pbc.pixel draw onto that SAME canvas as well as on the
+# display. Without this, mixing a "Bildschirm füllen" block with
+# turtle drawing produced two independent buffers -- the turtle's
+# canvas would overwrite the fill (or vice versa) and the screen
+# looked wrong/black. ONLY fill and pixel do this. Lines, rectangles,
+# ellipses, polygons and text go straight to the display, exactly as
+# on the device (its firmware has no active canvas at all); routing
+# them too would show pictures here that the PBC+ does not show.
+# None means "draw directly to the display" (the normal case).
 _active_canvas = None
 
 def _set_active_canvas(cv):
@@ -74,9 +77,9 @@ def pixel(x, y, c):
     _sprites_jetzt()
     x, y, c = _gint(x), _gint(y), _gint(c)
     if _active_canvas is not None:
+        # remembered on the canvas AND visible at once, as on the device
         _active_canvas.pixel(x, y, c)
-    else:
-        _d.pixel(x, y, c)
+    _d.pixel(x, y, c)
 def fill_rect(x, y, w, h, c):   _sprites_jetzt(); _d.fill_rect(_gint(x), _gint(y), _gint(w), _gint(h), _gint(c))
 def rect(x, y, w, h, c, fill=False):
     _sprites_jetzt()
@@ -756,7 +759,9 @@ class Sprite:
             self.x = int(sx + dx * t)
             self.y = int(sy + dy * t)
             _redraw_sprites()
-            __js.globalThis.__pbc.sleep_ms(16)
+            # 1 = Stop pressed while waiting (as time.sleep_ms does)
+            if __js.globalThis.__pbc.sleep_ms(16):
+                raise KeyboardInterrupt()
 
     def glide_by(self, dx, dy, ms):
         self.glide_to(self.x + int(dx), self.y + int(dy), ms)
@@ -802,3 +807,24 @@ class Sprite:
 def sprite(path):
     img = load_image(path)
     return Sprite(img)
+
+# Device-only functions. They exist in the firmware (and the editor
+# completes them), so here they say what is going on instead of failing
+# with "module has no attribute".
+def _nur_geraet(name):
+    def f(*a, **kw):
+        raise NotImplementedError("pbc." + name + "() works only on the real PBC+, not in the emulator")
+    return f
+
+menu = _nur_geraet("menu")
+on_press_up     = _nur_geraet("on_press_up")
+on_press_down   = _nur_geraet("on_press_down")
+on_press_left   = _nur_geraet("on_press_left")
+on_press_right  = _nur_geraet("on_press_right")
+on_press_center = _nur_geraet("on_press_center")
+on_press_a      = _nur_geraet("on_press_a")
+on_press_b      = _nur_geraet("on_press_b")
+
+def help():
+    print("pbc.help() prints the quick reference on the real PBC+.")
+    print("In PBC+ Studio the reference is in the help pane beside the editor.")

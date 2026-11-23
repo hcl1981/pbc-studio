@@ -21,9 +21,10 @@ Ergebnis ist wieder **eine einzige Datei**, die auf den Webspace kommt.
 python3 build.py          # erzeugt dist/index.html, dist/.htaccess, dist/pbcp.png
 ```
 
-`index.html` und `.htaccess` aus `dist/` in den Webspace legen (neben
+`index.html`, `.htaccess` und `robots.txt` aus `dist/` in den Webspace legen (neben
 `micropythonPBCP.uf2`, `kontakt.php` und `pbcp.png`, dem Platinenfoto des
-Emulators, das dort schon liegt; `dist/pbcp.png` ist dieselbe Datei). Die `.htaccess` setzt zwei HTTP-Header
+Emulators, das dort schon liegt; `dist/pbcp.png` ist dieselbe Datei). Die `.htaccess` leitet auf https und
+auf die Adresse ohne `www` um und setzt zwei HTTP-Header
 (Cross-Origin-Opener-Policy, Cross-Origin-Embedder-Policy). **Der Emulator
 braucht sie**; ohne sie (lokal geöffnete Datei, anderer Server) meldet er
 das im Terminal und unter **Einstellungen → Emulator**. Der Rest der IDE
@@ -53,6 +54,7 @@ Die `.htaccess` lässt sie komprimiert ausliefern.
 | 12 Meldungen vor Dialogen | Kurze Meldungen (unten eingeblendet) liegen jetzt **vor** offenen Dialogen; vorher blitzten sie hinter z. B. „Bilder verwalten“ nur kurz durch (Build 124). |
 | 13 Stopp ohne Fehlermeldung | ■ Stopp während **▶ Testen** auf dem PicoBoy zeigt keinen roten KeyboardInterrupt-Traceback und keinen Fehlerhinweis mehr; der Ton wird danach unsichtbar abgeschaltet statt Code ins Terminal zu tippen (Build 125). |
 | 14 Englisch vollständig, Datenschutz | Restliche deutsche Texte der englischen Oberfläche übersetzt (Dialoge, Auswahllisten der Blöcke, Terminal); `tests/englisch_test.mjs` vergleicht jetzt die deutsche mit der englischen Seite und findet alles, was gleich geblieben ist. Neuer Dialog **Datenschutz** in der Fußzeile. „Bearbeitung aktivieren“ steht links in der Leiste, wo das Emulatorfenster es nicht verdeckt (Build 142). |
+| 15 Korrekturen nach Durchsicht | Ein einziger Bestätigungsdialog (`confirmDialog`; Esc und Klick daneben antworten „nein“, Löschabfragen wieder mit rotem Knopf), alle `confirm()`/`alert()` des Browsers durch eigene Dialoge ersetzt; ■ Stopp beendet `glide_to` und Turtle-Fahrten sofort; Statuszeile zeigt den Emulator; alter Block `pbc_load_image` erzeugt wieder Python; `turtle.get_canvas()` im Emulator, `pbc.menu`/`pbc.on_press_*` melden klar „nur auf dem PBC+“; `pbc.pixel` neben einer Turtle sofort sichtbar; `lang`, Viewport, Fußzeilen-Links per Tastatur; Umleitung auf https ohne `www`, `robots.txt`. `tests/korrekturen_test.mjs` (Build 144). |
 
 Der Emulator bringt sein eigenes MicroPython 1.29.0 mit (Variante „pbc“,
 eingebettet in die Datei, siehe `micropython/README.md`); vom CDN wird nichts

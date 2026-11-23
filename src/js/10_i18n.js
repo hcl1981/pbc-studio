@@ -18,6 +18,8 @@
 const LANG_KEY = 'pbc.lang';
 let LANG = 'de';
 try { LANG = localStorage.getItem(LANG_KEY) || 'de'; } catch (e) {}
+// for screen readers, spell checking and the browser's "translate?" offer
+document.documentElement.lang = LANG === 'en' ? 'en' : 'de';
 
 const I18N_EN = {
   // -- App + toolbar -------------------------------------------------
@@ -983,7 +985,7 @@ const I18N_EN = {
     "Images on the PBC+",
   "Hochgeladene PNG-Dateien kannst du direkt auf dem Display anzeigen lassen (Block":
     "You can show uploaded PNG files directly on the display (block",
-  "unter „Display\") oder als Sprite verwenden (Blöcke unter „Sprites\"). Zum Hoch- oder Anzeigen muss das Gerät verbunden sein.":
+  "unter „Display\") oder als Sprite verwenden (Blöcke unter „Sprites\"). Zum Hochladen oder Anzeigen muss das Gerät verbunden sein.":
     "under “Display”) or use them as sprites (blocks under “Sprites”). The device must be connected to upload or show them.",
   "Farbe wählen":
     "Choose colour",

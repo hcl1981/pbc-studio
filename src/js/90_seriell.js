@@ -474,7 +474,7 @@ async function handleUnexpectedDisconnect() {
     document.getElementById('btn-connect').classList.remove('connected');
     document.getElementById('btn-connect').textContent = t('Verbinden');
     const info = document.getElementById('conn-info');
-    if (info) info.textContent = '';
+    if (info) info.textContent = t('nicht verbunden');
     if (typeof updateConnectButton === 'function') updateConnectButton();
   } catch (_) {}
   term.write('\r\n\x1b[31m-- ' + t('Verbindung verloren') + ' --\x1b[0m\r\n');

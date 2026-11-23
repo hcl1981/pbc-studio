@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { starteServer } from './server.mjs';
+import { dialogeBestaetigen } from './dialoge.mjs';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
@@ -20,6 +21,7 @@ const browser = await chromium.launch({ executablePath: CHROME });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('dialog', (d) => d.accept());
+  await dialogeBestaetigen(page);
   const seitenfehler = [];
   page.on('pageerror', (e) => seitenfehler.push(e.message));
   await page.goto(`http://127.0.0.1:${srv.port}/index.html`);

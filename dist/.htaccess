@@ -1,3 +1,19 @@
+# PBC+ Studio: always https, always without "www".
+# The USB connection (Web Serial) and the emulator (SharedArrayBuffer)
+# exist only in a secure context; over plain http neither works.
+# A request counts as https if ANY of the three signs says so, so that
+# a server which reports it differently cannot end in a redirect loop.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{SERVER_PORT} !=443
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteCond %{HTTP_HOST} ^(?:www\.)?(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+</IfModule>
+
 # PBC+ Studio: cross-origin isolation for the worker emulator.
 # With these two headers the browser provides SharedArrayBuffer, and
 # PBC+ Studio runs programs in a Web Worker (real sleep/input, Stop

@@ -916,20 +916,9 @@ function setMode(text, opts) {
   } else {
     // ---- Going back to blocks ----
     // Switching to blocks regenerates Python from the block tree, so
-    // anything the user typed in the editor will be overwritten. Only
-    // warn when the current content actually differs from what we put
-    // there on entry -- if they switched, didn't touch anything, and
-    // switched back, no need to interrupt them.
-    if (isTextMode && codeEditor) {
-      const cur = codeEditor.getValue();
-      if (cur !== textBaseline && !confirm(t(
-          'Wenn du jetzt zu den Blöcken zurückwechselst, gehen alle ' +
-          'Änderungen am Python-Code verloren. Die Blöcke ' +
-          'überschreiben den Editor-Inhalt.\n\n' +
-          'Wirklich zurückwechseln?'))) {
-        return;
-      }
-    }
+    // anything the user typed in the editor will be overwritten. The
+    // warning about that is modusUmschalten()'s job (the button); a
+    // file being loaded has already asked "discard the program?".
     wrap.hidden = true;
     blkDiv.style.display = '';
     isTextMode = false;
@@ -946,19 +935,36 @@ function setMode(text, opts) {
   }
 }
 
+// The "Zu Text wechseln" / "Zu Blöcken wechseln" button. Going back to
+// blocks throws away what was typed, so ask first -- but only when the
+// editor content actually differs from what we put there on entry: if
+// they switched, didn't touch anything, and switched back, there is no
+// need to interrupt them.
+async function modusUmschalten() {
+  if (isTextMode && codeEditor && codeEditor.getValue() !== textBaseline) {
+    const ok = await confirmDialog('', t(
+        'Wenn du jetzt zu den Blöcken zurückwechselst, gehen alle ' +
+        'Änderungen am Python-Code verloren. Die Blöcke ' +
+        'überschreiben den Editor-Inhalt.\n\n' +
+        'Wirklich zurückwechseln?'));
+    if (!ok) return;
+  }
+  setMode(!isTextMode);
+}
+
 // Wires up the "Bearbeitung aktivieren" button that appears when the
 // user switches from blocks → text. Asks for explicit confirmation
 // since switching back to blocks afterwards will throw away their
 // edits.
 function setupEditLockButton() {
-  document.getElementById('btn-edit-on').addEventListener('click', () => {
-    if (!confirm(t(
+  document.getElementById('btn-edit-on').addEventListener('click', async () => {
+    if (!(await confirmDialog('', t(
         'Wenn du die Python-Bearbeitung aktivierst, geht der Weg ' +
         'NUR IN EINE RICHTUNG:\n\n' +
         '  Blöcke  →  Python (jetzt)\n' +
         '  Python  →  Blöcke ist NICHT möglich.\n\n' +
         'Du kannst zwar zurück zu den Blöcken wechseln, aber dann ' +
-        'gehen deine Python-Änderungen verloren.\n\nFortfahren?'))) {
+        'gehen deine Python-Änderungen verloren.\n\nFortfahren?')))) {
       return;
     }
     if (codeEditor) {

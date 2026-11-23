@@ -556,7 +556,7 @@ for n in sorted(os.listdir('/')):
       await downloadFile(f.name);
     });
     row.querySelector('[data-del]').addEventListener('click', async () => {
-      if (!confirm(t('„%1“ wirklich löschen?').replace('%1', f.name))) return;
+      if (!(await confirmDelete(t('„%1“ wirklich löschen?').replace('%1', f.name)))) return;
       if (deviceMode === 'emulator' && window.__emuImgDelete) {
         await window.__emuImgDelete(f.name);
         toast(f.name + ' ' + t('gelöscht'), 'good');

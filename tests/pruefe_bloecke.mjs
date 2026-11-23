@@ -8,6 +8,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dialogeBestaetigen } from './dialoge.mjs';
 
 // Free TCP port for the local web server (parallel runs must not clash).
 const freierPort = () => new Promise((ok) => {
@@ -56,6 +57,7 @@ let fehler = 0;
 try {
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
   page.on('dialog', (d) => d.accept());
+  await dialogeBestaetigen(page);
   page.on('pageerror', (e) => { console.error('Seitenfehler:', e.message); fehler++; });
   await page.goto(`http://127.0.0.1:${PORT}/index.html`);
   await page.waitForFunction(() => { try { return !!workspace; } catch (_) { return false; } });

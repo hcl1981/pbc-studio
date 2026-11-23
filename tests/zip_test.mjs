@@ -23,6 +23,7 @@ const zip = path.join(ordner, 'bilder.zip');
 const namen = ['apfel.png', 'korb.png', 'labyrinth.png', 'meteor.png'];
 execFileSync('python3', ['-c', `
 import zipfile, sys
+import { dialogeBestaetigen } from './dialoge.mjs';
 m, z = sys.argv[1], sys.argv[2]
 with zipfile.ZipFile(z, 'w') as f:
     f.write(m + '/apfel.png', 'apfel.png', zipfile.ZIP_DEFLATED)
@@ -39,6 +40,7 @@ const browser = await chromium.launch({ executablePath: CHROME });
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   page.on('dialog', (d) => d.accept());
+  await dialogeBestaetigen(page);
   const seitenfehler = [];
   page.on('pageerror', (e) => seitenfehler.push(e.message));
   await page.goto(`http://127.0.0.1:${srv.port}/index.html`);

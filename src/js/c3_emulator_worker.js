@@ -293,7 +293,7 @@ async function emuWorkerRun(code) {
   emuSetRgb(0, 0, 0);
   emuTonAus();
   emuClearEdges();
-  // Block mode keeps one emulator convenience: plain pbc.fill & co.
+  // Block mode keeps one emulator convenience: pbc.fill and pbc.pixel
   // draw on the active Canvas (pbc._set_active_canvas in pbc_emu.py).
   if (!isTextMode) {
     code = code.replace(/^([ \t]*)([A-Za-z_][\w]*)\s*=\s*pbc\.Canvas\([^\n]*\)[ \t]*$/gm,

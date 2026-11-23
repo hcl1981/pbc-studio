@@ -801,6 +801,12 @@ Blockly.Blocks['pbc_load_image'] = {
     this.setColour(HUE_NUM.sprite);
   },
 };
+// The block is no longer in the sidebar, but older .pbcp files contain
+// it; without a generator such a project could not be run at all.
+PY.forBlock['pbc_load_image'] = function(block) {
+  const name = (block.getFieldValue('NAME') || '').replace(/[\r\n\\']/g, '');
+  return [`pbc.load_image('${name}')`, 0];
+};
 
 // Arithmetic block: + − × ÷ % combined into one with a dropdown so
 // students see them all at once. Uses Blockly's standard math hue

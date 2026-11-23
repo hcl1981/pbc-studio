@@ -911,32 +911,45 @@ function spawnVariableInit(varName, initValue, isText) {
 // Themed yes/no replacement for window.confirm(). Same rationale as
 // askString -- mobile browsers can silently queue the native dialog,
 // and a custom modal also matches the rest of the UI.
-function confirmDialog(title, message) {
+// THE one confirm dialog of the page (there used to be a second
+// function of the same name further down, which silently replaced
+// this one). Resolves true/false; Escape and a click beside the
+// dialog count as "no", so the promise always settles.
+//   yesLabel   text of the confirming button (default "OK")
+//   noLabel    text of the other button (default "Abbrechen")
+//   danger     red confirming button, for deleting and discarding
+function confirmDialog(title, message, yesLabel, noLabel, danger) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
+    overlay.className = 'pbc-confirm';
     overlay.style.cssText =
       'position:fixed; inset:0; background:rgba(0,0,0,0.55);' +
       'display:flex; align-items:center; justify-content:center;' +
       'z-index:100000;';
 
     const dialog = document.createElement('div');
+    dialog.setAttribute('role', 'alertdialog');
+    dialog.setAttribute('aria-modal', 'true');
     dialog.style.cssText =
       'background:var(--bg-1, #1f2630); color:var(--fg-0, #fff);' +
-      'padding:20px 22px; border-radius:8px; min-width:320px;' +
-      'max-width:480px; box-shadow:0 4px 24px rgba(0,0,0,0.4);' +
+      'padding:20px 22px; border-radius:8px; min-width:min(320px, 90vw);' +
+      'max-width:min(480px, 94vw); box-sizing:border-box;' +
+      'box-shadow:0 4px 24px rgba(0,0,0,0.4);' +
       'border:1px solid var(--border, #2d3744);' +
       'font-family:inherit;';
 
     if (title) {
       const h = document.createElement('div');
       h.textContent = title;
-      h.style.cssText = 'font-weight:600; font-size:15px; margin-bottom:10px;';
+      h.style.cssText = 'font-weight:600; font-size:15px; margin-bottom:' +
+                        (message ? '10px' : '16px') + ';';
       dialog.appendChild(h);
     }
     if (message) {
       const m = document.createElement('div');
       m.textContent = message;
-      m.style.cssText = 'font-size:13px; line-height:1.4; margin-bottom:16px;';
+      m.style.cssText = 'font-size:13px; line-height:1.4; margin-bottom:16px;' +
+                        'white-space:pre-wrap;';
       dialog.appendChild(m);
     }
 
@@ -944,21 +957,30 @@ function confirmDialog(title, message) {
     buttons.style.cssText =
       'display:flex; gap:8px; justify-content:flex-end;';
 
+    let done = false;
     function finish(value) {
+      if (done) return;
+      done = true;
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
       resolve(value);
     }
 
     const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = t('Abbrechen');
+    cancelBtn.textContent = noLabel || t('Abbrechen');
     cancelBtn.className = 'tb-btn';
+    cancelBtn.dataset.dlg = 'no';
     cancelBtn.addEventListener('click', () => finish(false));
 
     const okBtn = document.createElement('button');
-    okBtn.textContent = t('Löschen');
-    okBtn.className = 'tb-btn';
-    okBtn.style.background  = 'var(--danger-dim,#7a2a2a)';
-    okBtn.style.borderColor = 'var(--danger,#e57373)';
+    okBtn.textContent = yesLabel || 'OK';
+    okBtn.dataset.dlg = 'yes';
+    if (danger) {
+      okBtn.className = 'tb-btn';
+      okBtn.style.background  = 'var(--danger-dim,#7a2a2a)';
+      okBtn.style.borderColor = 'var(--danger,#e57373)';
+    } else {
+      okBtn.className = 'tb-btn primary';
+    }
     okBtn.addEventListener('click', () => finish(true));
 
     buttons.appendChild(cancelBtn);
@@ -968,9 +990,10 @@ function confirmDialog(title, message) {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) finish(false);
     });
+    // Enter on a focused button is that button's click; only Escape
+    // needs handling here.
     dialog.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { e.preventDefault(); finish(false); }
-      if (e.key === 'Enter')  { e.preventDefault(); finish(true);  }
     });
 
     overlay.appendChild(dialog);
@@ -978,6 +1001,11 @@ function confirmDialog(title, message) {
 
     setTimeout(() => okBtn.focus(), 0);
   });
+}
+
+// "Really delete?" -- red "Löschen" button.
+function confirmDelete(title, message) {
+  return confirmDialog(title, message, t('Löschen'), null, true);
 }
 
 // Render a sidebar entry that mixes a clickable name (spawns a get-
@@ -1142,7 +1170,7 @@ function renderVariableButtons(body) {
   addBtn(body, t('setze … auf …'), '#7ea4d7', (dropAt) => {
     const pick = numVars[0] || strVars[0];
     if (!pick) {
-      alert(t('Erstelle erst eine Variable unter "+ neue Variable…".'));
+      alertDialog('', t('Erstelle erst eine Variable unter "+ neue Variable…".'));
       return null;
     }
     return spawnBlock('variables_set', { VAR: pick.getId() }, dropAt);
@@ -1156,7 +1184,7 @@ function renderVariableButtons(body) {
   } else {
     numVars.forEach(v => {
       addVariableRow(body, v, '#7ea4d7', async () => {
-        const ok = await confirmDialog(t('Variable löschen?'));
+        const ok = await confirmDelete(t('Variable löschen?'));
         if (!ok) return;
         STRING_VAR_NAMES.delete(v.name);
         deleteVariableAndUsages(v.getId());
@@ -1206,7 +1234,7 @@ function renderVariableButtons(body) {
   addBtn(body, t('setze Text … auf …'), '#5f9ea0', (dropAt) => {
     const pick = strVars[0] || numVars[0];
     if (!pick) {
-      alert(t('Erstelle erst einen Text unter "+ neuer Text…".'));
+      alertDialog('', t('Erstelle erst einen Text unter "+ neuer Text…".'));
       return null;
     }
     return spawnBlock('variables_set', { VAR: pick.getId() }, dropAt);
@@ -1224,7 +1252,7 @@ function renderVariableButtons(body) {
   } else {
     strVars.forEach(v => {
       addVariableRow(body, v, '#5f9ea0', async () => {
-        const ok = await confirmDialog(t('Text löschen?'));
+        const ok = await confirmDelete(t('Text löschen?'));
         if (!ok) return;
         STRING_VAR_NAMES.delete(v.name);
         deleteVariableAndUsages(v.getId());
@@ -1497,7 +1525,7 @@ function renderListButtons(body) {
   } else {
     lists.forEach(v => {
       addVariableRow(body, v, color, async () => {
-        const ok = await confirmDialog(t('Liste löschen?'));
+        const ok = await confirmDelete(t('Liste löschen?'));
         if (!ok) return;
         deleteVariableAndUsages(v.getId());
         refreshVariablesCategory();
@@ -1981,9 +2009,9 @@ function renderSpriteButtons(body) {
       del.style.cssText =
         'color:var(--danger);font-size:18px;line-height:1;' +
         'padding:0 6px;cursor:pointer;';
-      del.addEventListener('click', (e) => {
+      del.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (!confirm(t('Sprite „%1“ löschen?').replace('%1', sp.name))) return;
+        if (!(await confirmDelete(t('Sprite „%1“ löschen?').replace('%1', sp.name)))) return;
         PBC_SPRITES.splice(idx, 1);
         refreshSpritesCategory();
         updateCodeView();
@@ -2288,15 +2316,15 @@ document.getElementById('new-sprite-ok').addEventListener('click', () => {
   // no warning.
   const cleaned = raw && raw.trim();
   const image = document.getElementById('new-sprite-image').value;
-  if (!cleaned) { alert(t('Bitte einen Namen eingeben.')); return; }
+  if (!cleaned) { alertDialog('', t('Bitte einen Namen eingeben.')); return; }
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(cleaned)) {
-    alert(t('Ungültiger Name. Erlaubt sind Buchstaben, Ziffern und Unterstriche. Nicht mit einer Ziffer beginnen.'));
+    alertDialog('', t('Ungültiger Name. Erlaubt sind Buchstaben, Ziffern und Unterstriche. Nicht mit einer Ziffer beginnen.'));
     return;
   }
-  if (!image)   { alert(t('Bitte ein Bild auswählen (oder eines hochladen).')); return; }
+  if (!image)   { alertDialog('', t('Bitte ein Bild auswählen (oder eines hochladen).')); return; }
   const taken = nameTakenCategory(cleaned);
   if (taken) {
-    alert(nameInUseMessage(cleaned, taken));
+    alertDialog('', nameInUseMessage(cleaned, taken));
     return;
   }
   PBC_SPRITES.push({ name: cleaned, image: image });

@@ -29,6 +29,11 @@ _canvas = None
 _BACKUP_SIZE = 20
 _backup = None
 
+def get_canvas():
+    """Return the shared turtle canvas (allocate if needed), as on the device."""
+    _ensure_canvas()
+    return _canvas
+
 def _ensure_canvas():
     """Create the shared canvas if needed. True if it was created
     (then it is known to be all black)."""
@@ -184,7 +189,9 @@ import js as _js
 
 # One display frame (16 ms) between animation steps.
 def _yield():
-    _js.globalThis.__pbc.sleep_ms(16)
+    # 1 = Stop pressed while waiting (as time.sleep_ms does)
+    if _js.globalThis.__pbc.sleep_ms(16):
+        raise KeyboardInterrupt()
 
 class Turtle:
     def __init__(self, canvas=None):
@@ -194,9 +201,9 @@ class Turtle:
             _canvas = canvas
         else:
             frisch = _ensure_canvas()
-        # Route plain pbc.fill / pbc.line / pbc.pixel / ... onto this
-        # same canvas, so "Bildschirm füllen" and turtle drawing share
-        # one surface instead of fighting over the display.
+        # Route pbc.fill and pbc.pixel onto this same canvas, so
+        # "Bildschirm füllen" and turtle drawing share one surface
+        # instead of fighting over the display (see pbc._active_canvas).
         if not js.globalThis.__pbcTextMode:
             pbc._set_active_canvas(_canvas)
         # Push the current canvas contents to the screen once so the

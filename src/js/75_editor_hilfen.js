@@ -43,7 +43,7 @@ const PY_OBJEKT_METHODEN = {
            'on_color'],
   sprite: ['show', 'hide', 'set_to', 'set_by', 'glide_to', 'glide_by', 'touches',
            'touches_edge', 'on_color', 'x', 'y', 'width', 'height'],
-  canvas: ['fill', 'pixel', 'line', 'hline', 'vline', 'rect', 'fill_rect', 'ellipse',
+  canvas: ['fill', 'pixel', 'line', 'hline', 'vline', 'rect', 'fill_rect', 'ellipse', 'poly',
            'text', 'text12', 'text18', 'text24', 'text12_width', 'text18_width',
            'text24_width', 'blit', 'stamp_on', 'width', 'height'],
 };
@@ -79,10 +79,10 @@ function pyNurCode(src) {
 // Which variables hold a turtle / sprite / canvas (x = turtle.Turtle() …).
 function pyObjektArten(code) {
   const arten = {};
-  const re = /(?:^|[^\w.])((?:self\.)?\w+)\s*=\s*(turtle\.Turtle|pbc\.sprite|pbc\.Canvas|pbc\.load_image)\s*\(/g;
+  const re = /(?:^|[^\w.])((?:self\.)?\w+)\s*=\s*(turtle\.Turtle|pbc\.[sS]prite|pbc\.Canvas|pbc\.load_image)\s*\(/g;
   let m;
   while ((m = re.exec(code)) !== null) {
-    arten[m[1]] = m[2] === 'turtle.Turtle' ? 'turtle' : m[2] === 'pbc.sprite' ? 'sprite' : 'canvas';
+    arten[m[1]] = m[2] === 'turtle.Turtle' ? 'turtle' : /^pbc\.[sS]prite$/.test(m[2]) ? 'sprite' : 'canvas';
   }
   return arten;
 }
@@ -121,8 +121,6 @@ function pyVorpruefung(src) {
       const teile = t.trim().split(/\s+as\s+/);
       importiert.add((teile[1] || teile[0]).trim());
     });
-    m = z.match(/^\s*from\s+(\w+)\s+import\b/);
-    if (m) importiert.add('from:' + m[1]);
   }
   const definiert = new Set();
   for (const z of zeilen) {

@@ -84,8 +84,8 @@ function setzeDateiname(name) {
 }
 setzeDateiname(aktuellerDateiname);
 
-document.getElementById('btn-new').addEventListener('click', () => {
-  if (!confirm(t('Aktuelles Programm verwerfen und neu beginnen?'))) return;
+document.getElementById('btn-new').addEventListener('click', async () => {
+  if (!(await confirmDialog(t('Aktuelles Programm verwerfen und neu beginnen?')))) return;
   setzeDateiname('');
   if (isTextMode) {
     if (codeEditor) codeEditor.setValue('');
@@ -256,8 +256,8 @@ for n in sorted(os.listdir('/')):
 
 async function deleteFromDevice(name) {
   if (!serialPort) { toast(t('Nicht verbunden'), 'bad'); return; }
-  if (!confirm(t('Datei „%1“ wirklich vom PBC+ löschen?').replace('%1', name) + '\n\n' +
-               t('Das kann nicht rückgängig gemacht werden.'))) {
+  if (!(await confirmDelete(t('Datei „%1“ wirklich vom PBC+ löschen?').replace('%1', name),
+                            t('Das kann nicht rückgängig gemacht werden.')))) {
     return;
   }
   const code = `
@@ -290,7 +290,7 @@ async function loadFromDevice(name) {
   // Loading replaces the current program -- warn first, same as the
   // "Neu" button and the local-file open path. Keeps the behaviour
   // consistent: any action that wipes the workspace asks first.
-  if (!confirm(t('Aktuelles Programm verwerfen und die Datei laden?'))) {
+  if (!(await confirmDialog(t('Aktuelles Programm verwerfen und die Datei laden?')))) {
     return;
   }
   document.getElementById('open-modal').classList.remove('show');
@@ -318,7 +318,7 @@ document.getElementById('file-open').addEventListener('change', async (e) => {
   // so warn first -- same courtesy as the "Neu" button. We reset the
   // input value on cancel so picking the same file again still fires
   // a change event.
-  if (!confirm(t('Aktuelles Programm verwerfen und die Datei laden?'))) {
+  if (!(await confirmDialog(t('Aktuelles Programm verwerfen und die Datei laden?')))) {
     e.target.value = '';
     return;
   }
@@ -483,8 +483,7 @@ async function openFromDevice() {
   });
 }
 
-document.getElementById('btn-mode').addEventListener('click',
-  () => setMode(!isTextMode));
+document.getElementById('btn-mode').addEventListener('click', modusUmschalten);
 
 /* =====================================================================
  * Toast

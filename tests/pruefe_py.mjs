@@ -28,6 +28,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dialogeBestaetigen } from './dialoge.mjs';
 
 const freierPort = () => new Promise((ok) => {
   const s = net.createServer();
@@ -105,6 +106,7 @@ const spec = (d) => {
 try {
   const page = await browser.newPage({ viewport: { width: 2000, height: 1500 }, deviceScaleFactor: 2 });
   page.on('dialog', (d) => d.accept());
+  await dialogeBestaetigen(page);
   page.on('pageerror', (e) => { console.error('Seitenfehler:', e.message); fehler++; });
   // The IDE loads Blockly, the editor and xterm from CDNs; retry a
   // failed page load a few times.

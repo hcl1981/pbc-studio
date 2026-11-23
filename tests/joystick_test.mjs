@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { starteServer } from './server.mjs';
+import { dialogeBestaetigen } from './dialoge.mjs';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
@@ -20,6 +21,7 @@ try {
   const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, hasTouch: true });
   const page = await ctx.newPage();
   page.on('dialog', (d) => d.accept());
+  await dialogeBestaetigen(page);
   page.on('pageerror', (e) => { console.log('Seitenfehler: ' + e.message); fehler++; });
   await page.goto(`http://127.0.0.1:${srv.port}/index.html`);
   await page.waitForFunction(() => { try { return !!workspace && !!term; } catch (_) { return false; } });

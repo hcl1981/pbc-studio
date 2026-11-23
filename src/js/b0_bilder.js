@@ -859,12 +859,12 @@ document.getElementById('paint-undo').addEventListener('click', () => {
   const ctx = document.getElementById('paint-canvas').getContext('2d');
   ctx.putImageData(paint.undoStack.pop(), 0, 0);
 });
-document.getElementById('paint-clear').addEventListener('click', () => {
+document.getElementById('paint-clear').addEventListener('click', async () => {
   // "Neu" starts over from the size picker -- the most common reason
   // a student wants a clean slate is also wanting a different size
   // (16x16 sprite vs 240x280 full screen, etc.). Always confirm so
   // a misclick doesn't wipe the in-progress drawing.
-  if (!confirm(t('Aktuelles Bild verwerfen und neu beginnen?'))) return;
+  if (!(await confirmDialog(t('Aktuelles Bild verwerfen und neu beginnen?')))) return;
   closePaintEditor();
   openPaintEditor();
 });
@@ -916,8 +916,8 @@ document.getElementById('paint-save').addEventListener('click', async () => {
   const existsOnDevice = probe && probe.stdout &&
                          probe.stdout.indexOf('EXISTS') >= 0;
   if (existsOnDevice) {
-    if (!confirm(t('Datei „') + name +
-                 t('" existiert bereits auf dem PBC+ und wird überschrieben. Fortfahren?'))) {
+    if (!(await confirmDialog(t('Datei „') + name +
+                 t('" existiert bereits auf dem PBC+ und wird überschrieben. Fortfahren?')))) {
       return;
     }
   }

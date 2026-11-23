@@ -145,6 +145,7 @@ async function connectEmulator() {
   // Mark as connected so runOnDevice/uploadBlob/etc. route to us.
   deviceMode = 'emulator';
   serialPort = { __emulator: true };
+  document.getElementById('conn-info').textContent = t('verbunden') + ' (Emulator)';
   // Reflect connected state on the new Verbinden/Trennen button.
   if (typeof updateConnectButton === 'function') updateConnectButton();
 
@@ -179,6 +180,7 @@ function disconnectEmulator() {
   document.getElementById('emulator-panel').style.display = 'none';
   deviceMode = null;
   serialPort = null;
+  document.getElementById('conn-info').textContent = t('nicht verbunden');
   setEmuStatus('getrennt');
   if (typeof updateConnectButton === 'function') updateConnectButton();
 }
@@ -191,10 +193,7 @@ document.getElementById('emu-close-btn').addEventListener(
 // --- images panel ------------------------------------------------
 // The Images button has been removed from the panel header per UX
 // request; the listing code stays available behind window.__showEmuImages
-// in case it's needed later. document.getElementById can return null
-// here (after the header redesign), so we only wire it up if the
-// element actually exists.
-const _emuImagesBtn = document.getElementById('emu-images-btn');
+// in case it's needed later.
 async function showEmuImages() {
   const list = document.getElementById('emu-images-list');
   if (!list) return;
@@ -227,14 +226,13 @@ async function showEmuImages() {
                      color:var(--bad);font-weight:bold;">×</button>
     `;
     row.querySelector('[data-del]').addEventListener('click', async () => {
-      if (!confirm(t('„%1“ aus dem Browser löschen?').replace('%1', name))) return;
+      if (!(await confirmDelete(t('„%1“ aus dem Browser löschen?').replace('%1', name)))) return;
       await imgDelete(name);
       showEmuImages();   // refresh
     });
     list.appendChild(row);
   });
 }
-if (_emuImagesBtn) _emuImagesBtn.addEventListener('click', showEmuImages);
 const _emuImagesClose = document.getElementById('emu-images-close');
 if (_emuImagesClose) _emuImagesClose.addEventListener('click', () => {
   document.getElementById('emu-images-modal').classList.remove('show');
