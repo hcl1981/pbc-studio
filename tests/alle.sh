@@ -23,6 +23,7 @@ lauf node pbcp_start_test.mjs
 lauf node englisch_test.mjs
 lauf node korrekturen_test.mjs
 lauf node zuruecksetzen_test.mjs
+lauf node stop_geraet_test.mjs
 node hilfe_beispiele.mjs >/dev/null && PBC_AUSGABE=ergebnisse/hilfe_aus node pruefe_py.mjs ergebnisse/hilfe/*.py > ergebnisse/hilfe.log 2>&1
 lauf node hilfe_auswerten.mjs < ergebnisse/hilfe.log
 if [ "${1:-}" = voll ]; then

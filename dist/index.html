@@ -1793,7 +1793,7 @@
 // by one with every build (no manual version bookkeeping needed). Shown
 // only in the terminal banner. APP_BUILD doubles as the internal build
 // marker, so there's a single source of truth.
-const APP_BUILD = 145;
+const APP_BUILD = 146;
 const APP_DATE  = '2026-11-24';   // build.py sets the day of the build
 
 /* =====================================================================
@@ -15993,6 +15993,9 @@ async function showFriendlyErrorHint(stderr) {
 // even if the first arrived during a critical section. Works equally
 // well for Testen-runs (which are in raw REPL) and for soft-booted
 // programs spinning in main.py.
+// Outside a Testen run the device's answer is not shown (build 146):
+// the traceback of the interrupt and the echo of the tone_off line used
+// to land in the terminal.
 document.getElementById('btn-stop').addEventListener('click', async () => {
   const isEmu = (deviceMode === 'emulator') ||
                 (serialPort && serialPort.__emulator);
@@ -16009,24 +16012,41 @@ document.getElementById('btn-stop').addEventListener('click', async () => {
   }
   if (serialWriter) {
     try {
-      // Phase 1: KeyboardInterrupt the running program.
-      await serialWriter.write(new Uint8Array([0x03, 0x03]));
-      term.write('\r\n\x1b[33m-- ' + t('Stop gesendet') + ' --\x1b[0m\r\n');
+      // A Testen run is already reading the device itself (interactive
+      // is off) and silences the speaker once it has ended (see the
+      // btn-test handler): just interrupt it.
+      if (window.__testlaufAktiv) {
+        await serialWriter.write(new Uint8Array([0x03, 0x03]));
+        term.write('\r\n\x1b[33m-- ' + t('Stop gesendet') + ' --\x1b[0m\r\n');
+        toast(t('Programm gestoppt'), 'good');
+        window.__stopImTestlauf = true;
+        return;
+      }
+      // Anything else (a program started from the start menu, main.py,
+      // an idle prompt): stop it without noise. What the device answers
+      // to the interrupt (a KeyboardInterrupt traceback through main.py
+      // and pbc.py) and the echo of the line that silences the speaker
+      // are no news for the user -- they are read here and dropped. The
+      // terminal gets one line and a fresh prompt.
+      interactive = false;
+      protoBuffer = new Uint8Array(0);
+      try {
+        // Phase 1: KeyboardInterrupt the running program.
+        await sendRaw('\r\x03\x03');
+        await sleep(200);
+        // Phase 2: silence the speaker. The student might have hit Stop
+        // while pbc.tone(...) was still going -- Ctrl-C unwinds the
+        // Python program but the PWM keeps running until something
+        // clears it. One line, so the cooked REPL needs no indentation.
+        await sendRaw("exec('try:\\n import pbc\\n pbc.tone_off()\\nexcept Exception:\\n pass')\r");
+        await sleep(250);
+      } finally {
+        protoBuffer = new Uint8Array(0);
+        interactive = true;
+      }
+      term.write('\r\n\x1b[33m-- ' + t('gestoppt') + ' --\x1b[0m');
+      await sendRaw('\r');              // the device answers with a fresh ">>> "
       toast(t('Programm gestoppt'), 'good');
-      // A Testen run silences the speaker itself once it has ended
-      // (see the btn-test handler) -- nothing to type into the REPL.
-      if (window.__testlaufAktiv) { window.__stopImTestlauf = true; return; }
-      // Phase 2: silence the speaker. The student might have hit Stop
-      // while pbc.tone(...) was still going -- Ctrl-C unwinds the
-      // Python program but the PWM keeps running until something
-      // clears it. We give the REPL a moment to be ready, then
-      // schedule a tiny "no_tone" call. Failures are silent: this is
-      // a courtesy, not a correctness requirement.
-      setTimeout(async () => {
-        try {
-          await sendRaw('\r\nimport pbc\r\ntry:\r\n  pbc.tone_off()\r\nexcept Exception:\r\n  pass\r\n');
-        } catch (_) {}
-      }, 200);
     } catch (e) {
       toast(t('Stop fehlgeschlagen:') + ' ' + e.message, 'bad');
     }
