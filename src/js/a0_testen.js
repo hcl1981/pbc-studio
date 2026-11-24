@@ -333,6 +333,8 @@ function findTurtleCommandsWithoutConstructor() {
 // without giving them a way back. The student gets a single click
 // solution: now the device boots straight into the launcher and
 // every .py and .pbcp file on it shows up as a runnable program.
+const LAUNCHER_CODE = "import pbc\npbc.menu()\n";
+
 async function installLauncher() {
   if (!serialPort) { toast(t('Erst verbinden.'), 'warn'); return; }
   const ok = await confirmDialog('',
@@ -351,7 +353,7 @@ async function installLauncher() {
   // Note the dance with the print() calls: their output ends up in
   // r.stdout below, which is how we tell the user whether the old
   // file was preserved (and under what name) or not.
-  const launcherCode = "import pbc\npbc.menu()\n";
+  const launcherCode = LAUNCHER_CODE;
   const code =
     'import os\n' +
     'try:\n' +
@@ -387,6 +389,59 @@ async function installLauncher() {
   } else {
     toast(t('Startmenü installiert'), 'good');
   }
+}
+
+// "Dateisystem zurücksetzen": format the PBC+'s flash filesystem. All
+// files go: programs, block projects, pictures, main.py (and with it
+// the launcher). A tick box in the dialog (on by default) puts the
+// launcher back afterwards. Only for the real device; the emulator
+// keeps its files in the browser and has nothing to format.
+async function resetFilesystem() {
+  if (!serialPort || deviceMode !== 'serial') {
+    toast(t('Das geht nur mit einem verbundenen PBC+.'), 'warn');
+    return;
+  }
+  const ok = await confirmDialog(
+    t('Dateisystem des PBC+ zurücksetzen?'),
+    t('Alle Dateien auf dem PBC+ werden gelöscht: Programme, ' +
+      'Block-Projekte, Bilder und das Startmenü.\n\n' +
+      'Das kann nicht rückgängig gemacht werden.\n\n' +
+      'Tipp: Mit „Flash-Backup erstellen“ im Menü Dateien kannst du ' +
+      'vorher alles sichern.'),
+    t('Alles löschen'), null, true,
+    { label: t('Startmenü danach neu installieren'), checked: true });
+  if (!ok) return;
+  const mitMenue = ok.checked;
+
+  // Unmount, format, mount again -- the same steps the firmware takes
+  // on a brand-new device. The flash object comes from rp2.Flash(), so
+  // this works even when the filesystem is damaged or not mounted.
+  const code =
+    'import os, vfs, rp2\n' +
+    'try:\n' +
+    "    os.chdir('/')\n" +
+    "    vfs.umount('/')\n" +
+    'except OSError:\n' +
+    '    pass\n' +
+    '_b = rp2.Flash()\n' +
+    'vfs.VfsLfs2.mkfs(_b, progsize=256)\n' +
+    "vfs.mount(vfs.VfsLfs2(_b, progsize=256), '/')\n" +
+    (mitMenue
+      ? "with open('/main.py', 'w') as _f:\n" +
+        '    _f.write(' + pyStringLit(LAUNCHER_CODE) + ')\n'
+      : '') +
+    "print('OK', ','.join(os.listdir('/')))\n";
+  const r = await runOnDevice(code, 20000);
+  const soll = mitMenue ? 'OK main.py' : 'OK';
+  if (!r || r.stderr || (r.stdout || '').trim().split(/\r?\n/).pop().trim() !== soll) {
+    toast(t('Zurücksetzen fehlgeschlagen'), 'bad');
+    if (r?.stderr) term.write('\r\n\x1b[31m' +
+                              r.stderr.replace(/\n/g,'\r\n') + '\x1b[0m');
+    return;
+  }
+  toast(mitMenue
+    ? t('Dateisystem zurückgesetzt, Startmenü installiert.')
+    : t('Dateisystem zurückgesetzt. Der PBC+ ist jetzt leer.'), 'good');
 }
 
 // =====================================================================

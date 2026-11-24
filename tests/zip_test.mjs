@@ -9,6 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { starteServer } from './server.mjs';
+import { dialogeBestaetigen } from './dialoge.mjs';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const STUDIO = path.resolve(process.env.PBC_STUDIO || path.join(HIER, '../dist'));
@@ -23,7 +24,6 @@ const zip = path.join(ordner, 'bilder.zip');
 const namen = ['apfel.png', 'korb.png', 'labyrinth.png', 'meteor.png'];
 execFileSync('python3', ['-c', `
 import zipfile, sys
-import { dialogeBestaetigen } from './dialoge.mjs';
 m, z = sys.argv[1], sys.argv[2]
 with zipfile.ZipFile(z, 'w') as f:
     f.write(m + '/apfel.png', 'apfel.png', zipfile.ZIP_DEFLATED)

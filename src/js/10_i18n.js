@@ -403,6 +403,16 @@ const I18N_EN = {
   'von':                            'of',
   'Startmenü installieren':         'Install launcher',
   'Startmenü installieren…':        'Install launcher…',
+  'Dateisystem zurücksetzen…':      'Reset file system…',
+  'Das geht nur mit einem verbundenen PBC+.': 'This needs a connected PBC+.',
+  'Dateisystem des PBC+ zurücksetzen?': 'Reset the file system of the PBC+?',
+  'Alle Dateien auf dem PBC+ werden gelöscht: Programme, Block-Projekte, Bilder und das Startmenü.\n\nDas kann nicht rückgängig gemacht werden.\n\nTipp: Mit „Flash-Backup erstellen“ im Menü Dateien kannst du vorher alles sichern.':
+    'All files on the PBC+ will be erased: programs, block projects, pictures and the launcher.\n\nThis cannot be undone.\n\nTip: “Create flash backup” in the Files menu saves everything first.',
+  'Alles löschen':                  'Erase everything',
+  'Zurücksetzen fehlgeschlagen':    'Reset failed',
+  'Startmenü danach neu installieren': 'Install the launcher again afterwards',
+  'Dateisystem zurückgesetzt, Startmenü installiert.': 'File system reset, launcher installed.',
+  'Dateisystem zurückgesetzt. Der PBC+ ist jetzt leer.': 'File system reset. The PBC+ is now empty.',
   'Datei vom PBC+ öffnen':          'Open file from PBC+',
   'Keine .py-Dateien auf dem Gerät.':
     'No .py files on the device.',

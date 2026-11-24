@@ -918,7 +918,10 @@ function spawnVariableInit(varName, initValue, isText) {
 //   yesLabel   text of the confirming button (default "OK")
 //   noLabel    text of the other button (default "Abbrechen")
 //   danger     red confirming button, for deleting and discarding
-function confirmDialog(title, message, yesLabel, noLabel, danger) {
+//   check      optional tick box above the buttons: {label, checked}.
+//              With it, "yes" resolves to {checked: true|false}
+//              instead of true ("no" stays false).
+function confirmDialog(title, message, yesLabel, noLabel, danger, check) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'pbc-confirm';
@@ -953,6 +956,23 @@ function confirmDialog(title, message, yesLabel, noLabel, danger) {
       dialog.appendChild(m);
     }
 
+    let checkBox = null;
+    if (check) {
+      const lab = document.createElement('label');
+      lab.style.cssText = 'display:flex; align-items:center; gap:8px;' +
+                          'font-size:13px; margin-bottom:16px; cursor:pointer;';
+      checkBox = document.createElement('input');
+      checkBox.type = 'checkbox';
+      checkBox.checked = !!check.checked;
+      checkBox.dataset.dlg = 'check';
+      checkBox.style.cssText = 'accent-color:var(--accent); margin:0;';
+      const txt = document.createElement('span');
+      txt.textContent = check.label;
+      lab.appendChild(checkBox);
+      lab.appendChild(txt);
+      dialog.appendChild(lab);
+    }
+
     const buttons = document.createElement('div');
     buttons.style.cssText =
       'display:flex; gap:8px; justify-content:flex-end;';
@@ -981,7 +1001,8 @@ function confirmDialog(title, message, yesLabel, noLabel, danger) {
     } else {
       okBtn.className = 'tb-btn primary';
     }
-    okBtn.addEventListener('click', () => finish(true));
+    okBtn.addEventListener('click',
+      () => finish(checkBox ? { checked: checkBox.checked } : true));
 
     buttons.appendChild(cancelBtn);
     buttons.appendChild(okBtn);

@@ -55,6 +55,7 @@ document.getElementById('codetab').addEventListener('click', () => {
     'transfer-to-emu': () => showTransferDialog('to-emu'),
     'transfer-to-dev': () => showTransferDialog('to-dev'),
     'install-launcher': () => installLauncher(),
+    'reset-filesystem': () => resetFilesystem(),
     'install-micropython': () => showInstallMicroPythonDialog(),
     'backup-flash': () => runFlashBackupUI(),
   };

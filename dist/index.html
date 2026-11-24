@@ -896,6 +896,7 @@
           <button data-action="backup-flash">Flash-Backup erstellen (.uf2)…</button>
           <button data-action="install-micropython">MicroPython installieren…</button>
           <button data-action="install-launcher">Startmenü installieren…</button>
+          <button data-action="reset-filesystem">Dateisystem zurücksetzen…</button>
         </div>
       </div>
 
@@ -1792,8 +1793,8 @@
 // by one with every build (no manual version bookkeeping needed). Shown
 // only in the terminal banner. APP_BUILD doubles as the internal build
 // marker, so there's a single source of truth.
-const APP_BUILD = 144;
-const APP_DATE  = '2026-11-23';   // build.py sets the day of the build
+const APP_BUILD = 145;
+const APP_DATE  = '2026-11-24';   // build.py sets the day of the build
 
 /* =====================================================================
  * Quiet Blockly's internal deprecation warning. Blockly 12's own
@@ -2393,6 +2394,16 @@ const I18N_EN = {
   'von':                            'of',
   'Startmenü installieren':         'Install launcher',
   'Startmenü installieren…':        'Install launcher…',
+  'Dateisystem zurücksetzen…':      'Reset file system…',
+  'Das geht nur mit einem verbundenen PBC+.': 'This needs a connected PBC+.',
+  'Dateisystem des PBC+ zurücksetzen?': 'Reset the file system of the PBC+?',
+  'Alle Dateien auf dem PBC+ werden gelöscht: Programme, Block-Projekte, Bilder und das Startmenü.\n\nDas kann nicht rückgängig gemacht werden.\n\nTipp: Mit „Flash-Backup erstellen“ im Menü Dateien kannst du vorher alles sichern.':
+    'All files on the PBC+ will be erased: programs, block projects, pictures and the launcher.\n\nThis cannot be undone.\n\nTip: “Create flash backup” in the Files menu saves everything first.',
+  'Alles löschen':                  'Erase everything',
+  'Zurücksetzen fehlgeschlagen':    'Reset failed',
+  'Startmenü danach neu installieren': 'Install the launcher again afterwards',
+  'Dateisystem zurückgesetzt, Startmenü installiert.': 'File system reset, launcher installed.',
+  'Dateisystem zurückgesetzt. Der PBC+ ist jetzt leer.': 'File system reset. The PBC+ is now empty.',
   'Datei vom PBC+ öffnen':          'Open file from PBC+',
   'Keine .py-Dateien auf dem Gerät.':
     'No .py files on the device.',
@@ -8891,7 +8902,10 @@ function spawnVariableInit(varName, initValue, isText) {
 //   yesLabel   text of the confirming button (default "OK")
 //   noLabel    text of the other button (default "Abbrechen")
 //   danger     red confirming button, for deleting and discarding
-function confirmDialog(title, message, yesLabel, noLabel, danger) {
+//   check      optional tick box above the buttons: {label, checked}.
+//              With it, "yes" resolves to {checked: true|false}
+//              instead of true ("no" stays false).
+function confirmDialog(title, message, yesLabel, noLabel, danger, check) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'pbc-confirm';
@@ -8926,6 +8940,23 @@ function confirmDialog(title, message, yesLabel, noLabel, danger) {
       dialog.appendChild(m);
     }
 
+    let checkBox = null;
+    if (check) {
+      const lab = document.createElement('label');
+      lab.style.cssText = 'display:flex; align-items:center; gap:8px;' +
+                          'font-size:13px; margin-bottom:16px; cursor:pointer;';
+      checkBox = document.createElement('input');
+      checkBox.type = 'checkbox';
+      checkBox.checked = !!check.checked;
+      checkBox.dataset.dlg = 'check';
+      checkBox.style.cssText = 'accent-color:var(--accent); margin:0;';
+      const txt = document.createElement('span');
+      txt.textContent = check.label;
+      lab.appendChild(checkBox);
+      lab.appendChild(txt);
+      dialog.appendChild(lab);
+    }
+
     const buttons = document.createElement('div');
     buttons.style.cssText =
       'display:flex; gap:8px; justify-content:flex-end;';
@@ -8954,7 +8985,8 @@ function confirmDialog(title, message, yesLabel, noLabel, danger) {
     } else {
       okBtn.className = 'tb-btn primary';
     }
-    okBtn.addEventListener('click', () => finish(true));
+    okBtn.addEventListener('click',
+      () => finish(checkBox ? { checked: checkBox.checked } : true));
 
     buttons.appendChild(cancelBtn);
     buttons.appendChild(okBtn);
@@ -12307,6 +12339,7 @@ document.getElementById('codetab').addEventListener('click', () => {
     'transfer-to-emu': () => showTransferDialog('to-emu'),
     'transfer-to-dev': () => showTransferDialog('to-dev'),
     'install-launcher': () => installLauncher(),
+    'reset-filesystem': () => resetFilesystem(),
     'install-micropython': () => showInstallMicroPythonDialog(),
     'backup-flash': () => runFlashBackupUI(),
   };
@@ -13967,6 +14000,8 @@ function findTurtleCommandsWithoutConstructor() {
 // without giving them a way back. The student gets a single click
 // solution: now the device boots straight into the launcher and
 // every .py and .pbcp file on it shows up as a runnable program.
+const LAUNCHER_CODE = "import pbc\npbc.menu()\n";
+
 async function installLauncher() {
   if (!serialPort) { toast(t('Erst verbinden.'), 'warn'); return; }
   const ok = await confirmDialog('',
@@ -13985,7 +14020,7 @@ async function installLauncher() {
   // Note the dance with the print() calls: their output ends up in
   // r.stdout below, which is how we tell the user whether the old
   // file was preserved (and under what name) or not.
-  const launcherCode = "import pbc\npbc.menu()\n";
+  const launcherCode = LAUNCHER_CODE;
   const code =
     'import os\n' +
     'try:\n' +
@@ -14021,6 +14056,59 @@ async function installLauncher() {
   } else {
     toast(t('Startmenü installiert'), 'good');
   }
+}
+
+// "Dateisystem zurücksetzen": format the PBC+'s flash filesystem. All
+// files go: programs, block projects, pictures, main.py (and with it
+// the launcher). A tick box in the dialog (on by default) puts the
+// launcher back afterwards. Only for the real device; the emulator
+// keeps its files in the browser and has nothing to format.
+async function resetFilesystem() {
+  if (!serialPort || deviceMode !== 'serial') {
+    toast(t('Das geht nur mit einem verbundenen PBC+.'), 'warn');
+    return;
+  }
+  const ok = await confirmDialog(
+    t('Dateisystem des PBC+ zurücksetzen?'),
+    t('Alle Dateien auf dem PBC+ werden gelöscht: Programme, ' +
+      'Block-Projekte, Bilder und das Startmenü.\n\n' +
+      'Das kann nicht rückgängig gemacht werden.\n\n' +
+      'Tipp: Mit „Flash-Backup erstellen“ im Menü Dateien kannst du ' +
+      'vorher alles sichern.'),
+    t('Alles löschen'), null, true,
+    { label: t('Startmenü danach neu installieren'), checked: true });
+  if (!ok) return;
+  const mitMenue = ok.checked;
+
+  // Unmount, format, mount again -- the same steps the firmware takes
+  // on a brand-new device. The flash object comes from rp2.Flash(), so
+  // this works even when the filesystem is damaged or not mounted.
+  const code =
+    'import os, vfs, rp2\n' +
+    'try:\n' +
+    "    os.chdir('/')\n" +
+    "    vfs.umount('/')\n" +
+    'except OSError:\n' +
+    '    pass\n' +
+    '_b = rp2.Flash()\n' +
+    'vfs.VfsLfs2.mkfs(_b, progsize=256)\n' +
+    "vfs.mount(vfs.VfsLfs2(_b, progsize=256), '/')\n" +
+    (mitMenue
+      ? "with open('/main.py', 'w') as _f:\n" +
+        '    _f.write(' + pyStringLit(LAUNCHER_CODE) + ')\n'
+      : '') +
+    "print('OK', ','.join(os.listdir('/')))\n";
+  const r = await runOnDevice(code, 20000);
+  const soll = mitMenue ? 'OK main.py' : 'OK';
+  if (!r || r.stderr || (r.stdout || '').trim().split(/\r?\n/).pop().trim() !== soll) {
+    toast(t('Zurücksetzen fehlgeschlagen'), 'bad');
+    if (r?.stderr) term.write('\r\n\x1b[31m' +
+                              r.stderr.replace(/\n/g,'\r\n') + '\x1b[0m');
+    return;
+  }
+  toast(mitMenue
+    ? t('Dateisystem zurückgesetzt, Startmenü installiert.')
+    : t('Dateisystem zurückgesetzt. Der PBC+ ist jetzt leer.'), 'good');
 }
 
 // =====================================================================
